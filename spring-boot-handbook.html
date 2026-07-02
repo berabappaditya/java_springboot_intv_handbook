@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Boot Handbook — Complete Notes (Part 1 & 2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F8FAFC;          /* page background */
+  --paper-deep:#FFFFFF;     /* sidebar */
+  --rule:#E2E8F0;           /* hairline borders */
+  --ink:#16A34A;            /* Spring green accent */
+  --ink-dark:#0F172A;       /* headings / strong */
+  --red:#E11D48;            /* warnings & callouts */
+  --text:#374151;
+  --muted:#64748B;
+  --card:#FFFFFF;
+  --code-bg:#0F172A;
+  --code-ink:#E2E8F0;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--text);
+  line-height:1.7;
+  font-size:15.5px;
+  -webkit-font-smoothing:antialiased;
+}
+/* ---------- layout ---------- */
+.wrap{display:flex;min-height:100vh}
+nav{
+  width:284px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--paper-deep);
+  border-right:1px solid var(--rule);
+  padding:32px 20px 48px;
+}
+nav::-webkit-scrollbar{width:5px}
+nav::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+nav h1{
+  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.02em;
+  margin-bottom:4px;
+}
+nav .sub{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink);font-weight:600;margin-bottom:24px;
+}
+nav .part-label{
+  font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:22px 0 8px;font-weight:600;
+  padding-bottom:6px;border-bottom:1px solid var(--rule);
+}
+nav a{
+  display:flex;align-items:baseline;color:var(--text);text-decoration:none;font-size:13.5px;
+  padding:6px 10px;border-radius:8px;font-weight:450;transition:background .15s,color .15s;
+}
+nav a:hover{background:#F0FDF4;color:var(--ink-dark)}
+nav a .n{
+  flex-shrink:0;width:28px;color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+}
+nav a:hover .n{color:var(--ink)}
+main{flex:1;max-width:1080px;padding:56px 64px 120px;margin:0 auto}
+/* ---------- sections & headings ---------- */
+section{
+  margin-bottom:64px;background:var(--card);
+  border:1px solid var(--rule);border-radius:16px;
+  padding:40px 44px 34px;box-shadow:var(--shadow);
+  scroll-margin-top:24px;
+}
+h2{
+  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-size:26px;font-weight:700;letter-spacing:-.02em;
+  margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--rule);
+  display:flex;align-items:baseline;gap:14px;
+}
+h2 .num{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  color:var(--ink);background:#F0FDF4;border:1px solid #BBF7D0;
+  padding:3px 10px;border-radius:6px;letter-spacing:0;flex-shrink:0;transform:translateY(-3px);
+}
+h3{
+  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-size:17.5px;font-weight:600;letter-spacing:-.01em;
+  margin:32px 0 12px;display:flex;align-items:center;gap:10px;
+}
+h3::before{content:"";width:4px;height:17px;border-radius:2px;background:var(--ink);flex-shrink:0}
+h4{
+  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-size:14.5px;font-weight:600;margin:18px 0 8px;
+}
+p{margin-bottom:12px;max-width:80ch}
+ul,ol{margin:0 0 14px 22px}
+li{margin-bottom:6px}
+strong{color:var(--ink-dark);font-weight:600}
+em.note{color:var(--red);font-style:normal;font-weight:600}
+/* ---------- cards / boxes ---------- */
+.box{
+  background:#F8FAFC;border:1px solid var(--rule);border-radius:12px;
+  padding:18px 22px;margin:14px 0 20px;
+}
+.box.dashed{border-style:dashed;background:var(--card)}
+.box.redline{background:#FFF1F2;border-color:#FECDD3}
+.box-title{
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dark);
+  margin-bottom:10px;display:block;
+}
+.box.redline .box-title{color:var(--red)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;margin-top:16px}
+/* keep both columns starting at the same baseline (reset first-child top margins) */
+.cols>*{margin-top:0}
+.cols>*>:first-child{margin-top:0}
+@media(max-width:940px){.cols{grid-template-columns:1fr}}
+/* ---------- tables ---------- */
+table{
+  width:100%;border-collapse:separate;border-spacing:0;margin:14px 0 22px;
+  background:var(--card);font-size:13.5px;
+  border:1px solid var(--rule);border-radius:10px;overflow:hidden;
+}
+th{
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  text-align:left;padding:10px 14px;background:#F8FAFC;
+  border-bottom:1px solid var(--rule);
+}
+td{
+  padding:10px 14px;color:var(--text);vertical-align:top;
+  border-bottom:1px solid var(--rule);
+}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td, table tr:hover td{background:#FAFCFF}
+td code, li code, p code{
+  font-family:'JetBrains Mono',monospace;font-size:12.3px;
+  background:#F1F5F9;color:#0F766E;border:1px solid #E2E8F0;
+  padding:1px 6px;border-radius:5px;white-space:nowrap;
+}
+/* ---------- code blocks ---------- */
+pre{
+  background:var(--code-bg);color:var(--code-ink);border-radius:12px;
+  padding:18px 20px;overflow-x:auto;margin:12px 0 20px;
+  font-family:'JetBrains Mono',monospace;font-size:12.8px;line-height:1.65;
+}
+pre .c{color:#7C8DB0;font-style:italic}
+pre .k{color:#93C5FD}
+pre .a{color:#6EE7B7}
+pre .s{color:#FCA5A5}
+/* ---------- flow diagrams ---------- */
+/* horizontal flow = single clean row; scroll instead of ragged wrapping */
+.flow{
+  display:flex;flex-wrap:nowrap;align-items:stretch;gap:0;
+  margin:16px 0 22px;overflow-x:auto;padding-bottom:6px;
+}
+.flow::-webkit-scrollbar{height:6px}
+.flow::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+.flow .step{
+  background:#F8FAFC;border:1px solid var(--rule);border-radius:10px;
+  padding:12px 16px;text-align:center;min-width:110px;flex:0 0 auto;
+  font-size:13px;font-weight:600;color:var(--ink-dark);
+  display:flex;flex-direction:column;justify-content:center;
+}
+.flow .step small{display:block;font-weight:400;color:var(--muted);font-size:11.5px;margin-top:3px;line-height:1.4}
+.flow .arr{
+  flex:0 0 auto;align-self:center;color:var(--ink);font-size:14px;padding:0 12px;
+  font-weight:600;white-space:nowrap;text-align:center;
+}
+/* vertical flow = neat centred column with equal-width boxes */
+.flow.vert{flex-direction:column;flex-wrap:nowrap;align-items:center;overflow-x:visible}
+.flow.vert .step{width:100%;max-width:320px}
+.flow.vert .arr{padding:4px 0;transform:rotate(90deg)}
+/* ---------- badges ---------- */
+.pill{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+  border:1px solid var(--rule);border-radius:6px;padding:2px 9px;margin:2px 4px 2px 0;
+  color:var(--ink-dark);background:#F8FAFC;letter-spacing:.02em;
+}
+.tag-get{color:#16A34A;border-color:#BBF7D0;background:#F0FDF4}
+.tag-post{color:#D97706;border-color:#FDE68A;background:#FFFBEB}
+.tag-put{color:#2563EB;border-color:#BFDBFE;background:#EFF6FF}
+.tag-del{color:#E11D48;border-color:#FECDD3;background:#FFF1F2}
+/* ---------- part divider ---------- */
+.part-divider{margin:56px 0 48px;text-align:center;position:relative}
+.part-divider span{
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink);
+  background:var(--paper);padding:0 22px;position:relative;z-index:1;
+}
+.part-divider::before{
+  content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule);
+}
+.footer-note{
+  font-family:'Space Grotesk',sans-serif;color:var(--muted);
+  font-size:14.5px;font-weight:500;text-align:center;margin-top:48px;
+  border-top:1px solid var(--rule);padding-top:24px;line-height:2;
+}
+@media(max-width:820px){
+  nav{display:none}
+  main{padding:28px 18px 80px}
+  section{padding:26px 20px}
+  h2{font-size:22px;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h1>Spring Boot Handbook</h1>
+  <div class="sub">Complete study notes</div>
+  <div class="part-label">Part 1 — Fundamentals</div>
+  <a href="#s1"><span class="n">1.</span>What is Spring &amp; Spring Boot?</a>
+  <a href="#s2"><span class="n">2.</span>Spring Boot Architecture</a>
+  <a href="#s3"><span class="n">3.</span>IoC Container &amp; DI</a>
+  <a href="#s4"><span class="n">4.</span>Bean Lifecycle &amp; Scope</a>
+  <a href="#s5"><span class="n">5.</span>Spring Annotations</a>
+  <a href="#s6"><span class="n">6.</span>REST API Basics</a>
+  <a href="#s7"><span class="n">7.</span>Project Structure</a>
+  <a href="#s8"><span class="n">8.</span>First CRUD API — Flow</a>
+  <a href="#s9"><span class="n">9.</span>Application Properties</a>
+  <a href="#s10"><span class="n">10.</span>Run &amp; Test the App</a>
+  <div class="part-label">Part 2 — Advanced</div>
+  <a href="#s11"><span class="n">11.</span>Auto-Configuration &amp; Starters</a>
+  <a href="#s12"><span class="n">12.</span>JPA &amp; Hibernate</a>
+  <a href="#s13"><span class="n">13.</span>Spring Data JPA Repositories</a>
+  <a href="#s14"><span class="n">14.</span>DTOs, Lombok &amp; Mapping</a>
+  <a href="#s15"><span class="n">15.</span>Validation</a>
+  <a href="#s16"><span class="n">16.</span>Exception Handling</a>
+  <a href="#s17"><span class="n">17.</span>Transactions</a>
+  <a href="#s18"><span class="n">18.</span>Spring Security Basics</a>
+  <a href="#s19"><span class="n">19.</span>Actuator, Logging &amp; DevTools</a>
+  <a href="#s20"><span class="n">20.</span>Caching, Scheduling &amp; Async</a>
+  <a href="#s21"><span class="n">21.</span>Testing Spring Boot Apps</a>
+  <a href="#s22"><span class="n">22.</span>Microservices Quick Intro</a>
+  <a href="#s23"><span class="n">23.</span>Interview Rapid-Fire Sheet</a>
+</nav>
+<main>
+
+<div class="part-divider" style="margin-top:0"><span>Part 1 · Fundamentals</span></div>
+
+<!-- ============ 1 ============ -->
+<section id="s1">
+<h2><span class="num">1.</span> WHAT IS SPRING &amp; SPRING BOOT?</h2>
+
+<div class="cols">
+<div>
+<h3>What is Spring?</h3>
+<ul>
+<li>Spring is a <strong>lightweight Java framework</strong>.</li>
+<li>It provides a comprehensive <strong>programming and configuration model</strong> for modern Java-based enterprise applications.</li>
+<li>It is built on core concepts like <strong>IoC, DI and AOP</strong>.</li>
+</ul>
+<h3>What is Spring Boot?</h3>
+<ul>
+<li>Spring Boot is an <strong>extension of the Spring framework</strong>.</li>
+<li>It simplifies development by <strong>auto-configuration</strong> and <strong>convention over configuration</strong>.</li>
+<li>It helps to create <strong>stand-alone, production-ready</strong> applications with minimal setup.</li>
+<li>It has <strong>embedded servers</strong> (Tomcat, Jetty, Undertow) and reduces boilerplate code.</li>
+</ul>
+</div>
+<div>
+<div class="box dashed redline">
+<div class="box-title">Why Spring Boot?</div>
+<ul>
+<li>Faster development</li>
+<li>Auto configuration</li>
+<li>Embedded servers</li>
+<li>Production ready</li>
+<li>Less XML, more Annotations</li>
+<li>Easy Dependency Management</li>
+<li>Built-in Actuator &amp; Monitoring</li>
+</ul>
+</div>
+<div class="flow vert">
+<div class="step">WEB SERVER</div><div class="arr">→</div>
+<div class="step">CONFIGURATION</div><div class="arr">→</div>
+<div class="step">DEPENDENCIES</div><div class="arr">→</div>
+<div class="step">DEPLOYMENT</div>
+</div>
+<p style="text-align:center;color:var(--ink-dark)">Spring Boot makes it simple and ready to run.</p>
+</div>
+</div>
+
+<h3>Spring Framework Modules</h3>
+<div class="flow">
+<div class="step">Core<small>(IoC, DI)</small></div><div class="arr">·</div>
+<div class="step">AOP<small>(Aspects)</small></div><div class="arr">·</div>
+<div class="step">JDBC<small>(Database Access)</small></div><div class="arr">·</div>
+<div class="step">ORM<small>(Hibernate, JPA)</small></div><div class="arr">·</div>
+<div class="step">MVC<small>(Web Layer)</small></div><div class="arr">·</div>
+<div class="step">Security<small>(Auth &amp; Security)</small></div><div class="arr">·</div>
+<div class="step">…and more</div>
+</div>
+
+<h3>Spring vs Spring Boot</h3>
+<table>
+<tr><th>Feature</th><th>Spring Framework</th><th>Spring Boot</th></tr>
+<tr><td>Configuration</td><td>Manual configuration</td><td>Auto configuration</td></tr>
+<tr><td>Setup</td><td>Complex</td><td>Simple</td></tr>
+<tr><td>Server</td><td>External (Tomcat, Jetty etc.)</td><td>Embedded (Tomcat, Jetty etc.)</td></tr>
+<tr><td>Deployment</td><td>WAR file</td><td>JAR file</td></tr>
+<tr><td>Development</td><td>Time consuming</td><td>Very fast</td></tr>
+<tr><td>XML Usage</td><td>More XML</td><td>Less / No XML</td></tr>
+<tr><td>Monitoring</td><td>Manual setup</td><td>Built-in Actuator</td></tr>
+<tr><td>Main Goal</td><td>Provide full control</td><td>Convention over configuration</td></tr>
+</table>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="s2">
+<h2><span class="num">2.</span> SPRING BOOT ARCHITECTURE</h2>
+
+<p>Spring Boot follows a <strong>layered architecture</strong>. Each layer has a specific responsibility and they work together to handle a request.</p>
+
+<h3>Architecture Flow</h3>
+<div class="flow">
+<div class="step">Client<small>(Browser / Postman)</small></div><div class="arr">→ HTTP Request →</div>
+<div class="step">Dispatcher Servlet<small>(Front Controller)</small></div><div class="arr">→</div>
+<div class="step">Controller<small>(Handles Request)</small></div><div class="arr">→</div>
+<div class="step">Service<small>(Business Logic)</small></div><div class="arr">→</div>
+<div class="step">Repository<small>(Data Access)</small></div><div class="arr">→</div>
+<div class="step">Database</div>
+</div>
+<p style="color:var(--ink-dark)">⇠ ⇠ ⇠ HTTP Response travels back through the same layers ⇠ ⇠ ⇠</p>
+
+<h3>Components Description</h3>
+<table>
+<tr><th>Component</th><th>Responsibility</th></tr>
+<tr><td><strong>Client</strong></td><td>Sends HTTP request and receives response.</td></tr>
+<tr><td><strong>DispatcherServlet</strong></td><td>Front controller of Spring MVC. It receives the request and dispatches it to the appropriate controller.</td></tr>
+<tr><td><strong>Controller</strong></td><td>Handles the request, validates input and returns response.</td></tr>
+<tr><td><strong>Service</strong></td><td>Contains business logic and calls repository.</td></tr>
+<tr><td><strong>Repository</strong></td><td>Interacts with database to perform CRUD operations.</td></tr>
+<tr><td><strong>Database</strong></td><td>Stores application data.</td></tr>
+</table>
+
+<div class="box dashed">
+<div class="box-title">Example Flow</div>
+<p style="margin:0"><code>Client → DispatcherServlet → Controller → Service → Repository → Database</code><br>
+<code>Database → Repository → Service → Controller → DispatcherServlet → Client</code></p>
+</div>
+
+<h3>Example Code (Controller)</h3>
+<pre><span class="a">@RestController</span>                              <span class="c">// Marks this class as REST Controller</span>
+<span class="a">@RequestMapping</span>(<span class="s">"/api/users"</span>)                <span class="c">// Base URL for all APIs in this controller</span>
+<span class="k">public class</span> UserController {
+
+    <span class="a">@Autowired</span>                               <span class="c">// Injects UserService dependency</span>
+    <span class="k">private</span> UserService userService;
+
+    <span class="a">@GetMapping</span>(<span class="s">"/{id}"</span>)                     <span class="c">// Maps GET request with user id</span>
+    <span class="k">public</span> User getUser(<span class="a">@PathVariable</span> Long id) {
+        <span class="k">return</span> userService.getUser(id);      <span class="c">// Calls service layer and returns data</span>
+    }
+}</pre>
+
+<h3>Example (application.properties)</h3>
+<pre>server.port = 8080
+spring.datasource.url = jdbc:mysql://localhost:3306/demo
+spring.datasource.username = root
+spring.datasource.password = root
+spring.jpa.hibernate.ddl-auto = update
+spring.jpa.show-sql = true                   <span class="c"># Basic configuration for database & server</span></pre>
+<p><em class="note">This flow is the backbone of any Spring Boot web application.</em></p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="s3">
+<h2><span class="num">3.</span> IoC CONTAINER &amp; DEPENDENCY INJECTION</h2>
+
+<div class="cols">
+<div>
+<h3>3.1 What is IoC?</h3>
+<ul>
+<li><strong>IoC (Inversion of Control)</strong> is a principle where the control of object creation and management is transferred from application code to the <strong>Spring container</strong>.</li>
+<li>The container creates objects, wires them together, manages their lifecycle and dependencies.</li>
+</ul>
+</div>
+<div class="box dashed">
+<div class="box-title">Traditional vs IoC Approach</div>
+<div class="flow"><div class="step">Class A</div><div class="arr">→ new →</div><div class="step">Class B</div><div class="arr" style="color:var(--red)">Tight Coupling</div></div>
+<div class="flow"><div class="step">Class A</div><div class="arr">asks for →</div><div class="step">Spring IoC Container</div><div class="arr">→</div><div class="step">Class B</div></div>
+</div>
+</div>
+
+<h3>3.2 Spring IoC Container</h3>
+<ul>
+<li>Spring IoC container is responsible for <strong>creating, configuring and assembling</strong> the beans.</li>
+<li>The container <strong>provides the beans to the application</strong> when required.</li>
+</ul>
+<div class="flow">
+<div class="step">Bean 1, Bean 2, Bean 3<small>(definitions)</small></div><div class="arr">→</div>
+<div class="step" style="padding:20px 24px">Spring IoC Container</div><div class="arr">→</div>
+<div class="step">Bean A, Bean B, Bean C<small>(ready-to-use objects)</small></div>
+</div>
+
+<div class="cols">
+<div>
+<h3>3.3 Dependency Injection (DI)</h3>
+<ul>
+<li>DI is a <strong>design pattern</strong> where the container injects the required dependencies into the objects.</li>
+<li>It helps in achieving <strong>loose coupling</strong> and <strong>easy unit testing</strong>.</li>
+</ul>
+<div class="box">
+<div class="box-title">Types of DI</div>
+<ul style="margin-bottom:0">
+<li>Constructor Injection <em class="note">(recommended)</em></li>
+<li>Setter Injection</li>
+<li>Field Injection</li>
+</ul>
+</div>
+</div>
+<div>
+<h4>Example (Constructor Injection)</h4>
+<pre><span class="k">public class</span> UserService {
+    <span class="k">private</span> UserRepository userRepository;
+
+    <span class="k">public</span> UserService(UserRepository repo) {
+        <span class="k">this</span>.userRepository = repo;
+    }
+}</pre>
+</div>
+</div>
+
+<h3>3.4 Example Code</h3>
+<div class="cols">
+<div>
+<h4>1. Bean Class</h4>
+<pre><span class="a">@Repository</span>
+<span class="k">public class</span> UserRepository {
+    <span class="k">public</span> String getUserById(<span class="k">int</span> id) {
+        <span class="k">return</span> <span class="s">"User"</span> + id;
+    }
+}
+
+<span class="a">@Service</span>
+<span class="k">public class</span> UserService {
+    <span class="k">private</span> UserRepository userRepository;
+
+    <span class="c">// Constructor Injection</span>
+    <span class="k">public</span> UserService(UserRepository repo) {
+        <span class="k">this</span>.userRepository = repo;
+    }
+
+    <span class="k">public</span> String getUser(<span class="k">int</span> id) {
+        <span class="k">return</span> userRepository.getUserById(id);
+    }
+}</pre>
+</div>
+<div>
+<h4>2. Configuration (Java Based)</h4>
+<pre><span class="a">@Configuration</span>
+<span class="k">public class</span> AppConfig {
+
+    <span class="a">@Bean</span>
+    <span class="k">public</span> UserRepository userRepository() {
+        <span class="k">return new</span> UserRepository();
+    }
+
+    <span class="a">@Bean</span>
+    <span class="k">public</span> UserService userService(
+            UserRepository userRepository) {
+        <span class="k">return new</span> UserService(userRepository);
+    }
+}</pre>
+<h4>3. Main Class</h4>
+<pre><span class="k">public class</span> MainApplication {
+    <span class="k">public static void</span> main(String[] args) {
+        AnnotationConfigApplicationContext
+            context = <span class="k">new</span>
+            AnnotationConfigApplicationContext
+                (AppConfig.<span class="k">class</span>);
+
+        UserService service =
+            context.getBean(UserService.<span class="k">class</span>);
+
+        System.out.println(service.getUser(1));
+
+        context.close();
+    }
+}</pre>
+</div>
+</div>
+
+<div class="box redline">
+<div class="box-title">3.5 Key Points</div>
+<ul style="margin-bottom:0">
+<li>IoC reduces <strong>tight coupling</strong> between classes.</li>
+<li>DI makes code more <strong>testable and maintainable</strong>.</li>
+<li>Spring container <strong>manages the lifecycle</strong> of beans.</li>
+<li>We just declare our dependencies, container takes care of creation and injection.</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="s4">
+<h2><span class="num">4.</span> BEAN LIFECYCLE &amp; BEAN SCOPE</h2>
+
+<h3>4.1 Bean Lifecycle</h3>
+<p>Spring manages the complete lifecycle of a bean. The steps are:</p>
+<div class="cols">
+<div>
+<table>
+<tr><th>Step</th><th>What happens</th></tr>
+<tr><td>① Instantiate</td><td>Container creates bean instance.</td></tr>
+<tr><td>② Populate</td><td>Set values to the bean properties.</td></tr>
+<tr><td>③ Initialize</td><td>Call <code>BeanNameAware</code>, <code>InitializingBean</code>, <code>@PostConstruct</code> etc.</td></tr>
+<tr><td>④ Ready</td><td>Bean is ready to use.</td></tr>
+<tr><td>⑤ Destroy</td><td>Call <code>@PreDestroy</code>, <code>DisposableBean</code> before removing bean.</td></tr>
+</table>
+</div>
+<div>
+<div class="flow vert">
+<div class="step">Instantiate</div><div class="arr">→</div>
+<div class="step">Populate Properties</div><div class="arr">→</div>
+<div class="step">Initialize</div><div class="arr">→</div>
+<div class="step">Bean Ready to Use</div><div class="arr">→</div>
+<div class="step" style="border-color:var(--red);color:var(--red)">Destroy</div>
+</div>
+<p style="text-align:center">Steps 1–2 ⇒ Bean Created &nbsp;·&nbsp; Step 5 ⇒ Bean removed from container</p>
+</div>
+</div>
+
+<h3>4.2 Example of Lifecycle</h3>
+<div class="cols">
+<div>
+<pre><span class="k">public class</span> DemoBean <span class="k">implements</span> InitializingBean,
+                                 DisposableBean {
+    <span class="k">public</span> DemoBean() {
+        System.out.println(<span class="s">"1. Constructor"</span>);
+    }
+
+    <span class="a">@Override</span>
+    <span class="k">public void</span> afterPropertiesSet() {
+        System.out.println(<span class="s">"2. afterPropertiesSet()"</span>);
+    }
+
+    <span class="a">@PreDestroy</span>
+    <span class="k">public void</span> destroy() {
+        System.out.println(<span class="s">"5. @PreDestroy"</span>);
+    }
+}</pre>
+</div>
+<div>
+<div class="box">
+<div class="box-title">Output Order</div>
+<ol style="margin-left:20px">
+<li>Constructor</li>
+<li>afterPropertiesSet()</li>
+<li>Bean is ready to use</li>
+<li>Bean will do its work</li>
+<li>@PreDestroy</li>
+</ol>
+</div>
+<div class="box redline">
+<p style="margin:0"><em class="note">Note:</em> Steps 1 and 2 are done by Spring container <strong>for every bean</strong>.</p>
+</div>
+</div>
+</div>
+
+<h3>4.3 Bean Scopes</h3>
+<table>
+<tr><th>Scope</th><th>Description</th><th>Where it is used</th><th>Annotation / Config</th></tr>
+<tr><td><strong>Singleton</strong></td><td>Only one instance per Spring IoC container.</td><td>Default scope.</td><td><code>@Scope("singleton")</code> (default)</td></tr>
+<tr><td><strong>Prototype</strong></td><td>New instance for every request.</td><td>When each request needs separate object.</td><td><code>@Scope("prototype")</code></td></tr>
+<tr><td><strong>Request</strong></td><td>One instance per HTTP request.</td><td>Web applications.</td><td><code>@Scope("request")</code></td></tr>
+<tr><td><strong>Session</strong></td><td>One instance per HTTP session.</td><td>Web applications.</td><td><code>@Scope("session")</code></td></tr>
+<tr><td><strong>Application</strong></td><td>One instance per ServletContext.</td><td>Web applications.</td><td><code>@Scope("application")</code></td></tr>
+<tr><td><strong>WebSocket</strong></td><td>One instance per WebSocket session.</td><td>WebSocket applications.</td><td><code>@Scope("websocket")</code></td></tr>
+</table>
+
+<div class="cols">
+<div>
+<h4>Example</h4>
+<pre><span class="a">@Component</span>
+<span class="a">@Scope</span>(<span class="s">"prototype"</span>)
+<span class="k">public class</span> Student {
+    <span class="c">// class body</span>
+}</pre>
+</div>
+<div>
+<p style="margin-top:44px">→ Every time container is asked for <strong>Student</strong> bean, it will create a <strong>new object</strong>.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="s5">
+<h2><span class="num">5.</span> SPRING ANNOTATIONS</h2>
+
+<h3>5.1 Common Stereotype Annotations</h3>
+<table>
+<tr><th>Annotation</th><th>Used For</th><th>Description</th><th>Example</th></tr>
+<tr><td><code>@Component</code></td><td>General component</td><td>Marks a class as a Spring managed component.</td><td><code>@Component public class EmailUtil { }</code></td></tr>
+<tr><td><code>@Service</code></td><td>Service layer</td><td>Indicates that the class belongs to service layer.</td><td><code>@Service public class UserService { }</code></td></tr>
+<tr><td><code>@Repository</code></td><td>Data access layer</td><td>Indicates that the class is responsible for database access.</td><td><code>@Repository public interface UserRepository extends JpaRepository&lt;User, Long&gt; { }</code></td></tr>
+<tr><td><code>@Controller</code></td><td>Web MVC controller</td><td>Marks a class as Spring MVC Controller. Returns view name.</td><td><code>@Controller public class HomeController { }</code></td></tr>
+<tr><td><code>@RestController</code></td><td>REST API controller</td><td>Combination of <code>@Controller</code> and <code>@ResponseBody</code>.</td><td><code>@RestController public class UserController { }</code></td></tr>
+<tr><td><code>@Configuration</code></td><td>Java based configuration</td><td>Indicates that the class provides bean definitions.</td><td><code>@Configuration public class AppConfig { }</code></td></tr>
+<tr><td><code>@Bean</code></td><td>Bean definition method</td><td>Marks a method as a bean creator in <code>@Configuration</code> class.</td><td><code>@Bean public DataSource dataSource() { return new HikariDataSource(); }</code></td></tr>
+</table>
+
+<h3>5.2 AutoWiring</h3>
+<ul>
+<li>AutoWiring is used to <strong>inject the bean dependencies automatically</strong>.</li>
+<li>Types: <strong>byType (default)</strong>, <strong>byName</strong>, constructor, no.</li>
+</ul>
+<div class="cols">
+<div>
+<pre><span class="a">@Service</span>
+<span class="k">public class</span> UserService {
+    <span class="c">// dependency</span>
+    <span class="a">@Autowired</span>            <span class="c">// byType (default)</span>
+    <span class="k">private</span> UserRepository userRepository;
+}</pre>
+</div>
+<div>
+<div class="box">
+<div class="box-title">Other ways</div>
+<ul style="margin-bottom:0">
+<li><strong>byName</strong> → matches by property name</li>
+<li><strong>constructor</strong> → injects through constructor</li>
+<li><strong>no</strong> → no autowiring</li>
+</ul>
+</div>
+</div>
+</div>
+
+<h3>5.3 Component Scan</h3>
+<ul>
+<li>Spring Boot automatically <strong>scans the packages under the main class package</strong> and its sub-packages.</li>
+<li>It detects <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code> etc. and registers them as beans.</li>
+</ul>
+<div class="cols">
+<div>
+<pre><span class="a">@SpringBootApplication</span>
+<span class="k">public class</span> DemoApplication {
+    <span class="k">public static void</span> main(String[] args) {
+        SpringApplication.run(DemoApplication.<span class="k">class</span>, args);
+    }
+}</pre>
+</div>
+<div>
+<p style="margin-top:30px">→ This annotation includes <code>@ComponentScan</code>, <code>@Configuration</code> and <code>@EnableAutoConfiguration</code>.</p>
+</div>
+</div>
+
+<h3>5.4 Other Important Annotations</h3>
+<table>
+<tr><th>Annotation</th><th>Purpose</th></tr>
+<tr><td><code>@Value</code></td><td>Injects values from <code>application.properties</code> / <code>application.yml</code></td></tr>
+<tr><td><code>@Qualifier</code></td><td>Used with <code>@Autowired</code> to resolve ambiguity.</td></tr>
+<tr><td><code>@Primary</code></td><td>Marks one bean as primary when multiple beans of same type exist.</td></tr>
+<tr><td><code>@Lazy</code></td><td>Initializes the bean only when it is required.</td></tr>
+</table>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="s6">
+<h2><span class="num">6.</span> REST API BASICS IN SPRING BOOT</h2>
+
+<div class="cols">
+<div>
+<h3>6.1 What is REST API?</h3>
+<ul>
+<li><strong>REST (Representational State Transfer)</strong> is an architectural style for designing networked applications.</li>
+<li>It uses <strong>HTTP methods</strong> to perform <strong>CRUD</strong> operations on resources.</li>
+<li>Spring Boot makes it very easy to build RESTful web services.</li>
+</ul>
+</div>
+<div>
+<h4>CRUD using HTTP Methods</h4>
+<table>
+<tr><th>HTTP Method</th><th>Operation</th><th>Description</th></tr>
+<tr><td><span class="pill tag-get">GET</span></td><td>Read</td><td>Fetch data</td></tr>
+<tr><td><span class="pill tag-post">POST</span></td><td>Create</td><td>Create new resource</td></tr>
+<tr><td><span class="pill tag-put">PUT</span></td><td>Update</td><td>Update entire resource</td></tr>
+<tr><td><span class="pill tag-put">PATCH</span></td><td>Partial Update</td><td>Update partial data</td></tr>
+<tr><td><span class="pill tag-del">DELETE</span></td><td>Delete</td><td>Delete resource</td></tr>
+</table>
+</div>
+</div>
+
+<h3>6.2 REST API Flow</h3>
+<div class="flow">
+<div class="step">Client<small>(Browser / Postman)</small></div><div class="arr">→ HTTP Request →</div>
+<div class="step">Controller<small>(@RestController)</small></div><div class="arr">→</div>
+<div class="step">Service<small>(Business Logic)</small></div><div class="arr">→</div>
+<div class="step">Repository<small>(Data Access)</small></div><div class="arr">→</div>
+<div class="step">Database</div>
+</div>
+<p style="color:var(--ink-dark)">⇠ HTTP Response (JSON / XML) ⇠</p>
+
+<h3>6.3 Example — Simple REST Controller</h3>
+<div class="cols">
+<div>
+<pre><span class="a">@RestController</span>
+<span class="a">@RequestMapping</span>(<span class="s">"/api/users"</span>)
+<span class="k">public class</span> UserController {
+
+    <span class="a">@GetMapping</span>(<span class="s">"/{id}"</span>)
+    <span class="k">public</span> User getUser(<span class="a">@PathVariable</span> Long id) {
+        <span class="k">return new</span> User(id, <span class="s">"Aman"</span>, <span class="s">"aman@example.com"</span>);
+    }
+
+    <span class="a">@PostMapping</span>
+    <span class="k">public</span> User createUser(<span class="a">@RequestBody</span> User user) {
+        user.setId(101L);
+        <span class="k">return</span> user;
+    }
+
+    <span class="a">@PutMapping</span>(<span class="s">"/{id}"</span>)
+    <span class="k">public</span> User updateUser(<span class="a">@PathVariable</span> Long id,
+                           <span class="a">@RequestBody</span> User user) {
+        user.setId(id);
+        <span class="k">return</span> user;
+    }
+
+    <span class="a">@DeleteMapping</span>(<span class="s">"/{id}"</span>)
+    <span class="k">public</span> String deleteUser(<span class="a">@PathVariable</span> Long id) {
+        <span class="k">return</span> <span class="s">"User deleted with id: "</span> + id;
+    }
+}</pre>
+</div>
+<div>
+<div class="box">
+<div class="box-title">Explanation</div>
+<ul style="margin-bottom:0">
+<li><code>@RestController</code> = <code>@Controller</code> + <code>@ResponseBody</code></li>
+<li><code>@RequestMapping</code> defines base URL for the class</li>
+<li><code>@GetMapping</code> handles GET request</li>
+<li><code>@PostMapping</code> handles POST request</li>
+<li><code>@PutMapping</code> handles PUT request</li>
+<li><code>@DeleteMapping</code> handles DELETE request</li>
+<li><code>@PathVariable</code> fetches value from URL</li>
+<li><code>@RequestBody</code> binds request body to object</li>
+</ul>
+</div>
+<div class="box dashed">
+<div class="box-title">Sample JSON (Request Body)</div>
+<pre style="margin:0;border:none">{
+  <span class="s">"name"</span>:  <span class="s">"Aman"</span>,
+  <span class="s">"email"</span>: <span class="s">"aman@example.com"</span>,
+  <span class="s">"age"</span>:   25
+}</pre>
+</div>
+</div>
+</div>
+
+<h3>6.4 Response Example</h3>
+<div class="cols">
+<div>
+<p><span class="pill tag-get">GET</span> <code>/api/users/1</code> → Response (200 OK)</p>
+<pre>{
+  <span class="s">"id"</span>: 1,
+  <span class="s">"name"</span>: <span class="s">"Aman"</span>,
+  <span class="s">"email"</span>: <span class="s">"aman@example.com"</span>
+}</pre>
+</div>
+<div>
+<p><span class="pill tag-post">POST</span> <code>/api/users</code> → Response (201 Created)</p>
+<pre>{
+  <span class="s">"id"</span>: 101,
+  <span class="s">"name"</span>: <span class="s">"Aman"</span>,
+  <span class="s">"email"</span>: <span class="s">"aman@example.com"</span>
+}</pre>
+</div>
+</div>
+</section>
+
+<!-- ============ 7 & 8 ============ -->
+<section id="s7">
+<h2><span class="num">7.</span> SPRING BOOT PROJECT STRUCTURE</h2>
+
+<p>A typical Spring Boot project follows a standard folder structure.</p>
+<div class="cols">
+<div>
+<pre>src
+ └─ main
+     ├─ java
+     │   └─ com.example.demo
+     │        ├─ controller   <span class="c">→ REST Controllers</span>
+     │        ├─ service      <span class="c">→ Service classes (business logic)</span>
+     │        ├─ repository   <span class="c">→ JPA Repositories</span>
+     │        ├─ entity       <span class="c">→ Entity classes (Database tables)</span>
+     │        ├─ dto          <span class="c">→ Request / Response DTOs</span>
+     │        ├─ config       <span class="c">→ Configuration classes</span>
+     │        └─ exception    <span class="c">→ Custom exceptions & handlers</span>
+     └─ resources
+          ├─ application.properties  <span class="c">→ App configuration</span>
+          ├─ static                  <span class="c">→ Static files (css, js, images)</span>
+          └─ templates               <span class="c">→ Thymeleaf templates (if using)</span>
+ └─ test
+     └─ java
+         └─ com.example.demo
+              └─ DemoApplicationTests  <span class="c">→ Unit & Integration tests</span></pre>
+</div>
+<div>
+<div class="box dashed">
+<div class="box-title">Important Files</div>
+<table style="margin:0">
+<tr><td><code>DemoApplication.java</code></td><td>Main class</td></tr>
+<tr><td><code>application.properties</code></td><td>Configuration</td></tr>
+<tr><td><code>pom.xml</code></td><td>Dependencies</td></tr>
+<tr><td><code>build.gradle</code></td><td>Build file</td></tr>
+</table>
+</div>
+<div class="box dashed">
+<div class="box-title">Main Class Example</div>
+<pre style="margin:0;border:none"><span class="a">@SpringBootApplication</span>
+<span class="k">public class</span> DemoApplication {
+  <span class="k">public static void</span> main(String[] args) {
+    SpringApplication.run(
+        DemoApplication.<span class="k">class</span>, args);
+  }
+}</pre>
+</div>
+</div>
+</div>
+</section>
+
+<section id="s8">
+<h2><span class="num">8.</span> BUILD FIRST CRUD API — OVERVIEW FLOW</h2>
+
+<p>We will build a simple CRUD API for managing <strong>Student</strong> data.</p>
+<div class="flow">
+<div class="step">Client<small>(Postman / Browser)</small></div><div class="arr">→</div>
+<div class="step">Controller<small>(Handles Request)</small></div><div class="arr">→</div>
+<div class="step">Service<small>(Business Logic)</small></div><div class="arr">→</div>
+<div class="step">Repository<small>(Data Access)</small></div><div class="arr">→</div>
+<div class="step">Database<small>(MySQL)</small></div>
+</div>
+
+<div class="cols">
+<div>
+<h3>CRUD Endpoints</h3>
+<table>
+<tr><th>Action</th><th>Method</th><th>Endpoint</th></tr>
+<tr><td>Create</td><td><span class="pill tag-post">POST</span></td><td><code>/api/students</code></td></tr>
+<tr><td>Read All</td><td><span class="pill tag-get">GET</span></td><td><code>/api/students</code></td></tr>
+<tr><td>Read By Id</td><td><span class="pill tag-get">GET</span></td><td><code>/api/students/{id}</code></td></tr>
+<tr><td>Update</td><td><span class="pill tag-put">PUT</span></td><td><code>/api/students/{id}</code></td></tr>
+<tr><td>Delete</td><td><span class="pill tag-del">DELETE</span></td><td><code>/api/students/{id}</code></td></tr>
+</table>
+<div class="box dashed">
+<div class="box-title">Base URL</div>
+<p style="margin:0"><code>http://localhost:8080/api/students</code></p>
+</div>
+<h3>Technology Used</h3>
+<ul>
+<li>Spring Boot · Spring Web · Spring Data JPA · MySQL</li>
+<li>Lombok (optional) · Validation · Postman (for testing)</li>
+</ul>
+</div>
+<div>
+<h3>Dependencies in pom.xml</h3>
+<pre>&lt;<span class="a">dependency</span>&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/<span class="a">dependency</span>&gt;
+&lt;<span class="a">dependency</span>&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/<span class="a">dependency</span>&gt;
+&lt;<span class="a">dependency</span>&gt;
+  &lt;groupId&gt;mysql&lt;/groupId&gt;
+  &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+  &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/<span class="a">dependency</span>&gt;</pre>
+</div>
+</div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="s9">
+<h2><span class="num">9.</span> APPLICATION PROPERTIES &amp; CONFIGURATION</h2>
+
+<div class="cols">
+<div>
+<h3>9.1 What is application.properties?</h3>
+<ul>
+<li>It is the <strong>main configuration file</strong> in Spring Boot. We use it to configure database, server port, logging, and other properties.</li>
+</ul>
+<h3>9.2 Where is it located?</h3>
+<ul><li><code>src/main/resources/application.properties</code></li></ul>
+</div>
+<div>
+<div class="box dashed">
+<div class="box-title">How it works</div>
+<div class="flow">
+<div class="step">application.properties</div><div class="arr">loads →</div>
+<div class="step">Spring Environment</div><div class="arr">provides →</div>
+<div class="step">Values to Beans</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="cols">
+<div>
+<h3>9.3 Example Properties</h3>
+<pre>server.port = 8080
+
+spring.application.name = demo-app
+
+spring.datasource.url = jdbc:mysql://localhost:3306/demo
+spring.datasource.username = root
+spring.datasource.password = root123
+
+spring.jpa.hibernate.ddl-auto = update
+spring.jpa.show-sql = true
+
+logging.level.org.springframework = INFO
+logging.level.com.example.demo = DEBUG</pre>
+</div>
+<div>
+<h3>9.4 Accessing Properties in Code</h3>
+<h4>Using @Value</h4>
+<pre><span class="a">@Value</span>(<span class="s">"${app.name}"</span>)
+<span class="k">private</span> String appName;
+
+<span class="a">@Value</span>(<span class="s">"${server.port}"</span>)
+<span class="k">private int</span> port;</pre>
+<h4>Using @ConfigurationProperties</h4>
+<pre><span class="a">@Component</span>
+<span class="a">@ConfigurationProperties</span>(prefix = <span class="s">"app"</span>)
+<span class="k">public class</span> AppProperties {
+    <span class="k">private</span> String name;
+    <span class="k">private</span> String description;
+    <span class="c">// getters and setters</span>
+}</pre>
+</div>
+</div>
+
+<h3>9.5 Custom Properties Example</h3>
+<div class="cols">
+<div>
+<h4>application.properties</h4>
+<pre>app.name = Student Service
+app.description = This is a demo application</pre>
+</div>
+<div>
+<pre><span class="a">@Component</span>
+<span class="a">@ConfigurationProperties</span>(prefix = <span class="s">"app"</span>)
+<span class="k">public class</span> AppProperties {
+    <span class="k">private</span> String name;
+    <span class="k">private</span> String description;
+    <span class="c">// getters and setters</span>
+}</pre>
+</div>
+</div>
+
+<h3>9.6 Profile based Properties</h3>
+<p>We can have different properties for different environments.</p>
+<div class="cols">
+<div>
+<pre>resources
+ ├─ application.properties        <span class="c">→ (default)</span>
+ ├─ application-dev.properties    <span class="c">→ (for dev environment)</span>
+ └─ application-prod.properties   <span class="c">→ (for prod environment)</span></pre>
+</div>
+<div>
+<div class="box dashed">
+<div class="box-title">Activate Profile</div>
+<p>In <code>application.properties</code>:<br><code>spring.profiles.active = dev</code></p>
+<p style="margin:0">(or) Run from command line:<br><code>--spring.profiles.active=dev</code></p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+<h2><span class="num">10.</span> SPRING BOOT RUN &amp; TEST</h2>
+
+<div class="cols">
+<div>
+<h3>10.1 Run the Application</h3>
+<p>We can run the Spring Boot application in multiple ways.</p>
+<table>
+<tr><th>Method</th><th>Command</th></tr>
+<tr><td>1. From IDE</td><td>Right click on <code>DemoApplication.java</code> → Run 'DemoApplication'</td></tr>
+<tr><td>2. Using Maven</td><td><code>mvn spring-boot:run</code></td></tr>
+<tr><td>3. Using Gradle</td><td><code>gradle bootRun</code></td></tr>
+<tr><td>4. Using JAR</td><td><code>mvn clean package</code><br><code>java -jar target/demo-app.jar</code></td></tr>
+</table>
+</div>
+<div>
+<div class="box">
+<div class="box-title">Run Application</div>
+<div class="flow vert">
+<div class="step">Run Application<small>(e.g., http://localhost:8080)</small></div><div class="arr">→</div>
+<div class="step">Spring Boot Starts Embedded Server<small>(Tomcat)</small></div><div class="arr">→</div>
+<div class="step">Application Loaded &amp; Ready</div><div class="arr">→</div>
+<div class="step">API Endpoints Available</div>
+</div>
+</div>
+</div>
+</div>
+
+<h3>10.2 Sample API Endpoints (from our project)</h3>
+<table>
+<tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Sample Response</th></tr>
+<tr><td><span class="pill tag-get">GET</span></td><td><code>/api/students</code></td><td>Get all students</td><td><code>[{"id":1,"name":"Aman"}, ...]</code></td></tr>
+<tr><td><span class="pill tag-get">GET</span></td><td><code>/api/students/1</code></td><td>Get student by id</td><td><code>{"id":1,"name":"Aman","age":25}</code></td></tr>
+<tr><td><span class="pill tag-post">POST</span></td><td><code>/api/students</code></td><td>Create new student</td><td><code>{"id":101,"name":"Aman","age":25}</code></td></tr>
+<tr><td><span class="pill tag-put">PUT</span></td><td><code>/api/students/1</code></td><td>Update student</td><td><code>{"id":1,"name":"Aman","age":26}</code></td></tr>
+<tr><td><span class="pill tag-del">DELETE</span></td><td><code>/api/students/1</code></td><td>Delete student</td><td><code>{"message":"User deleted"}</code></td></tr>
+</table>
+
+<h3>10.3 Testing the APIs</h3>
+<p>We can test APIs using <strong>Postman / Browser / cURL</strong>.</p>
+<div class="cols">
+<div>
+<h4>Example: GET /api/students/1</h4>
+<p><strong>Request (GET):</strong> <code>http://localhost:8080/api/students/1</code></p>
+<p><strong>Response (200 OK):</strong></p>
+<pre>{
+  <span class="s">"id"</span>: 1,
+  <span class="s">"name"</span>: <span class="s">"Aman"</span>,
+  <span class="s">"email"</span>: <span class="s">"aman@example.com"</span>,
+  <span class="s">"age"</span>: 25
+}</pre>
+</div>
+<div>
+<h4>Example cURL (GET)</h4>
+<pre>curl -X GET http://localhost:8080/api/students/1
+     -H <span class="s">"Accept: application/json"</span></pre>
+<h4>Example cURL (POST)</h4>
+<pre>curl -X POST http://localhost:8080/api/students
+  -H <span class="s">"Content-Type: application/json"</span>
+  -d <span class="s">"{\"name\":\"Aman\",\"email\":\"aman@example.com\",\"age\":25}"</span></pre>
+</div>
+</div>
+
+<h3>10.4 Common Application Properties</h3>
+<div class="cols">
+<div>
+<table>
+<tr><th>Property</th><th>Use</th></tr>
+<tr><td><code>server.port=8080</code></td><td>Change application port</td></tr>
+<tr><td><code>spring.application.name=demo-app</code></td><td>Set application name</td></tr>
+<tr><td><code>spring.datasource.url=jdbc:mysql://localhost:3306/demo</code></td><td>Database connection URL</td></tr>
+<tr><td><code>spring.datasource.username=root</code></td><td>Database username</td></tr>
+<tr><td><code>spring.datasource.password=123</code></td><td>Database password</td></tr>
+<tr><td><code>spring.jpa.hibernate.ddl-auto=update</code></td><td>Auto create / update tables</td></tr>
+<tr><td><code>logging.level.org.springframework=INFO</code></td><td>Set logging level</td></tr>
+</table>
+</div>
+<div>
+<div class="box redline">
+<div class="box-title">What we covered in Part-1</div>
+<ol style="margin-left:20px;margin-bottom:0">
+<li>Spring Boot Overview</li>
+<li>Project Structure</li>
+<li>Maven Dependencies</li>
+<li>Bean Lifecycle &amp; Scope</li>
+<li>Spring Annotations</li>
+<li>REST API Basics</li>
+<li>Project Structure &amp; CRUD Flow</li>
+<li>Application Properties</li>
+<li>Run &amp; Test Application</li>
+</ol>
+</div>
+<div class="box dashed">
+<p style="margin:0;font-weight:600">Next → <strong>Advanced Topics in Part-2</strong> ↓</p>
+</div>
+</div>
+</div>
+</section>
+
+<div class="part-divider"><span>Part 2 · Advanced Topics</span></div>
+
+<!-- ============ 11 ============ -->
+<section id="s11">
+<h2><span class="num">11.</span> AUTO-CONFIGURATION &amp; STARTERS</h2>
+
+<h3>11.1 What is Auto-Configuration?</h3>
+<ul>
+<li>Spring Boot <strong>automatically configures beans</strong> based on the dependencies (JARs) present on the classpath.</li>
+<li>Example: if <code>spring-boot-starter-web</code> is on the classpath → Boot auto-configures <strong>DispatcherServlet, embedded Tomcat, Jackson JSON converter</strong>.</li>
+<li>If <code>H2</code> + <code>spring-boot-starter-data-jpa</code> are present → Boot auto-configures an <strong>in-memory DataSource + EntityManager</strong>.</li>
+<li>Enabled by <code>@EnableAutoConfiguration</code> (included inside <code>@SpringBootApplication</code>).</li>
+</ul>
+<div class="flow">
+<div class="step">Classpath JARs<small>(starters, drivers)</small></div><div class="arr">→</div>
+<div class="step">@EnableAutoConfiguration<small>reads AutoConfiguration.imports</small></div><div class="arr">→</div>
+<div class="step">@Conditional checks<small>(class present? bean missing?)</small></div><div class="arr">→</div>
+<div class="step">Beans auto-registered</div>
+</div>
+
+<h3>11.2 How it works internally</h3>
+<ul>
+<li>Auto-configuration classes are listed in <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code>.</li>
+<li>Each class is guarded by <strong>conditional annotations</strong>:</li>
+</ul>
+<table>
+<tr><th>Annotation</th><th>Bean is created only if…</th></tr>
+<tr><td><code>@ConditionalOnClass</code></td><td>a given class is on the classpath</td></tr>
+<tr><td><code>@ConditionalOnMissingBean</code></td><td>the user has NOT defined the bean already (your bean always wins)</td></tr>
+<tr><td><code>@ConditionalOnProperty</code></td><td>a property has a specific value</td></tr>
+<tr><td><code>@ConditionalOnWebApplication</code></td><td>the app is a web application</td></tr>
+</table>
+<div class="box redline">
+<p style="margin:0"><em class="note">Interview line:</em> "Auto-configuration is <strong>opinionated but overridable</strong> — Boot backs off the moment you define your own bean."</p>
+</div>
+
+<h3>11.3 Starters</h3>
+<ul>
+<li>A starter is a <strong>curated set of compatible dependencies</strong> bundled under one artifact — no version juggling.</li>
+</ul>
+<table>
+<tr><th>Starter</th><th>What it brings</th></tr>
+<tr><td><code>spring-boot-starter-web</code></td><td>Spring MVC, embedded Tomcat, Jackson</td></tr>
+<tr><td><code>spring-boot-starter-data-jpa</code></td><td>Spring Data JPA, Hibernate, JDBC</td></tr>
+<tr><td><code>spring-boot-starter-security</code></td><td>Spring Security (auth &amp; authorization)</td></tr>
+<tr><td><code>spring-boot-starter-validation</code></td><td>Bean Validation (Hibernate Validator)</td></tr>
+<tr><td><code>spring-boot-starter-test</code></td><td>JUnit 5, Mockito, AssertJ, MockMvc</td></tr>
+<tr><td><code>spring-boot-starter-actuator</code></td><td>Health, metrics, monitoring endpoints</td></tr>
+</table>
+
+<h3>11.4 Excluding an Auto-Configuration</h3>
+<pre><span class="a">@SpringBootApplication</span>(exclude = { DataSourceAutoConfiguration.<span class="k">class</span> })
+<span class="k">public class</span> DemoApplication { }</pre>
+<p><em class="note">Debug tip:</em> run with <code>--debug</code> to see the <strong>Auto-Configuration Report</strong> (which conditions matched / didn't match).</p>
+</section>
+
+<!-- ============ 12 ============ -->
+<section id="s12">
+<h2><span class="num">12.</span> JPA &amp; HIBERNATE (ENTITY MAPPING)</h2>
+
+<div class="cols">
+<div>
+<h3>12.1 What is JPA / Hibernate?</h3>
+<ul>
+<li><strong>JPA (Jakarta Persistence API)</strong> is a <strong>specification</strong> for ORM (Object Relational Mapping) in Java.</li>
+<li><strong>Hibernate</strong> is the most popular <strong>implementation</strong> of JPA — the default in Spring Boot.</li>
+<li>ORM maps Java classes → database tables, objects → rows, fields → columns.</li>
+</ul>
+</div>
+<div>
+<div class="box dashed">
+<div class="box-title">Relationship</div>
+<div class="flow">
+<div class="step">JPA<small>(specification / interface)</small></div><div class="arr">implemented by →</div>
+<div class="step">Hibernate<small>(implementation)</small></div><div class="arr">used via →</div>
+<div class="step">Spring Data JPA<small>(abstraction layer)</small></div>
+</div>
+</div>
+</div>
+</div>
+
+<h3>12.2 Entity Example</h3>
+<pre><span class="a">@Entity</span>
+<span class="a">@Table</span>(name = <span class="s">"students"</span>)
+<span class="k">public class</span> Student {
+
+    <span class="a">@Id</span>
+    <span class="a">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="k">private</span> Long id;
+
+    <span class="a">@Column</span>(name = <span class="s">"full_name"</span>, nullable = <span class="k">false</span>, length = 100)
+    <span class="k">private</span> String name;
+
+    <span class="a">@Column</span>(unique = <span class="k">true</span>)
+    <span class="k">private</span> String email;
+
+    <span class="k">private int</span> age;
+    <span class="c">// getters and setters</span>
+}</pre>
+
+<h3>12.3 Key JPA Annotations</h3>
+<table>
+<tr><th>Annotation</th><th>Purpose</th></tr>
+<tr><td><code>@Entity</code></td><td>Marks the class as a JPA entity (a table).</td></tr>
+<tr><td><code>@Table</code></td><td>Customizes table name / schema.</td></tr>
+<tr><td><code>@Id</code></td><td>Marks primary key field.</td></tr>
+<tr><td><code>@GeneratedValue</code></td><td>Auto-generates PK — IDENTITY, SEQUENCE, AUTO, TABLE.</td></tr>
+<tr><td><code>@Column</code></td><td>Column name, nullable, unique, length.</td></tr>
+<tr><td><code>@Transient</code></td><td>Field is NOT persisted to the database.</td></tr>
+<tr><td><code>@Enumerated(EnumType.STRING)</code></td><td>Store enum as string instead of ordinal.</td></tr>
+<tr><td><code>@CreationTimestamp / @UpdateTimestamp</code></td><td>Auto audit timestamps (Hibernate).</td></tr>
+</table>
+
+<h3>12.4 Relationships</h3>
+<table>
+<tr><th>Annotation</th><th>Meaning</th><th>Example</th></tr>
+<tr><td><code>@OneToOne</code></td><td>One row ↔ one row</td><td>Student ↔ Address</td></tr>
+<tr><td><code>@OneToMany</code></td><td>One row → many rows</td><td>Department → Students</td></tr>
+<tr><td><code>@ManyToOne</code></td><td>Many rows → one row (owning side, holds FK)</td><td>Student → Department</td></tr>
+<tr><td><code>@ManyToMany</code></td><td>Many ↔ many (join table)</td><td>Student ↔ Course</td></tr>
+</table>
+<pre><span class="a">@Entity</span>
+<span class="k">public class</span> Student {
+    <span class="a">@ManyToOne</span>(fetch = FetchType.LAZY)
+    <span class="a">@JoinColumn</span>(name = <span class="s">"department_id"</span>)
+    <span class="k">private</span> Department department;
+}
+
+<span class="a">@Entity</span>
+<span class="k">public class</span> Department {
+    <span class="a">@OneToMany</span>(mappedBy = <span class="s">"department"</span>, cascade = CascadeType.ALL)
+    <span class="k">private</span> List&lt;Student&gt; students;
+}</pre>
+
+<div class="cols">
+<div>
+<div class="box">
+<div class="box-title">FetchType — LAZY vs EAGER</div>
+<ul style="margin-bottom:0">
+<li><strong>LAZY</strong> → related data loaded only when accessed. <em class="note">(recommended)</em></li>
+<li><strong>EAGER</strong> → related data loaded immediately with the parent.</li>
+<li>Defaults: <code>@ManyToOne / @OneToOne</code> = EAGER, <code>@OneToMany / @ManyToMany</code> = LAZY.</li>
+</ul>
+</div>
+</div>
+<div>
+<div class="box redline">
+<div class="box-title">N+1 Problem (hot interview topic)</div>
+<p style="margin:0">Loading N parents then firing 1 query per child collection = N+1 queries. <strong>Fix:</strong> <code>JOIN FETCH</code> in JPQL, <code>@EntityGraph</code>, or batch fetching.</p>
+</div>
+</div>
+</div>
+
+<h3>12.5 ddl-auto Options</h3>
+<table>
+<tr><th>Value</th><th>Behaviour</th></tr>
+<tr><td><code>none</code></td><td>No schema action (safest for prod).</td></tr>
+<tr><td><code>validate</code></td><td>Validate schema matches entities, fail if not.</td></tr>
+<tr><td><code>update</code></td><td>Add missing tables/columns (dev convenience).</td></tr>
+<tr><td><code>create</code></td><td>Drop &amp; create schema at startup.</td></tr>
+<tr><td><code>create-drop</code></td><td>Create at startup, drop at shutdown (tests).</td></tr>
+</table>
+</section>
+
+<!-- ============ 13 ============ -->
+<section id="s13">
+<h2><span class="num">13.</span> SPRING DATA JPA REPOSITORIES</h2>
+
+<h3>13.1 Repository Hierarchy</h3>
+<div class="flow">
+<div class="step">Repository<small>(marker interface)</small></div><div class="arr">→</div>
+<div class="step">CrudRepository<small>(basic CRUD)</small></div><div class="arr">→</div>
+<div class="step">PagingAndSortingRepository<small>(+ paging, sorting)</small></div><div class="arr">→</div>
+<div class="step">JpaRepository<small>(+ flush, batch, JPA extras)</small></div>
+</div>
+
+<h3>13.2 Creating a Repository</h3>
+<pre><span class="a">@Repository</span>
+<span class="k">public interface</span> StudentRepository <span class="k">extends</span> JpaRepository&lt;Student, Long&gt; {
+    <span class="c">// free CRUD methods: save(), findById(), findAll(), deleteById(), count(), existsById() ...</span>
+}</pre>
+
+<h3>13.3 Derived Query Methods (query from method name)</h3>
+<pre>List&lt;Student&gt; findByName(String name);
+List&lt;Student&gt; findByAgeGreaterThan(<span class="k">int</span> age);
+List&lt;Student&gt; findByNameContainingIgnoreCase(String keyword);
+Optional&lt;Student&gt; findByEmail(String email);
+List&lt;Student&gt; findByAgeBetweenOrderByNameAsc(<span class="k">int</span> min, <span class="k">int</span> max);
+<span class="k">long</span> countByAge(<span class="k">int</span> age);
+<span class="k">boolean</span> existsByEmail(String email);
+<span class="k">void</span> deleteByEmail(String email);</pre>
+<table>
+<tr><th>Keyword</th><th>SQL equivalent</th></tr>
+<tr><td><code>findBy...And / Or</code></td><td>WHERE x AND / OR y</td></tr>
+<tr><td><code>GreaterThan / LessThan / Between</code></td><td>&gt;, &lt;, BETWEEN</td></tr>
+<tr><td><code>Like / Containing / StartingWith</code></td><td>LIKE '%..%'</td></tr>
+<tr><td><code>OrderBy...Asc/Desc</code></td><td>ORDER BY</td></tr>
+<tr><td><code>In / NotIn</code></td><td>IN (...)</td></tr>
+<tr><td><code>IsNull / IsNotNull</code></td><td>IS NULL</td></tr>
+</table>
+
+<h3>13.4 @Query — JPQL &amp; Native</h3>
+<pre><span class="c">// JPQL (works on entities, portable)</span>
+<span class="a">@Query</span>(<span class="s">"SELECT s FROM Student s WHERE s.age &gt; :age"</span>)
+List&lt;Student&gt; findOlderThan(<span class="a">@Param</span>(<span class="s">"age"</span>) <span class="k">int</span> age);
+
+<span class="c">// Native SQL (works on tables)</span>
+<span class="a">@Query</span>(value = <span class="s">"SELECT * FROM students WHERE email = ?1"</span>, nativeQuery = <span class="k">true</span>)
+Student findByEmailNative(String email);
+
+<span class="c">// Modifying query (UPDATE / DELETE) — needs @Transactional</span>
+<span class="a">@Modifying</span>
+<span class="a">@Query</span>(<span class="s">"UPDATE Student s SET s.age = :age WHERE s.id = :id"</span>)
+<span class="k">int</span> updateAge(<span class="a">@Param</span>(<span class="s">"id"</span>) Long id, <span class="a">@Param</span>(<span class="s">"age"</span>) <span class="k">int</span> age);</pre>
+
+<h3>13.5 Pagination &amp; Sorting</h3>
+<pre>Pageable pageable = PageRequest.of(0, 10, Sort.by(<span class="s">"name"</span>).ascending());
+Page&lt;Student&gt; page = studentRepository.findAll(pageable);
+
+page.getContent();       <span class="c">// list of 10 students</span>
+page.getTotalElements(); <span class="c">// total rows</span>
+page.getTotalPages();    <span class="c">// total pages</span>
+page.hasNext();          <span class="c">// is there a next page?</span></pre>
+<div class="box redline">
+<p style="margin:0"><em class="note">Interview line:</em> "JpaRepository gives CRUD for free; derived methods for simple queries; <code>@Query</code> when the method name gets unreadable; <code>Pageable</code> for any list endpoint."</p>
+</div>
+</section>
+
+<!-- ============ 14 ============ -->
+<section id="s14">
+<h2><span class="num">14.</span> DTOs, LOMBOK &amp; MAPPING</h2>
+
+<div class="cols">
+<div>
+<h3>14.1 Why DTOs?</h3>
+<ul>
+<li><strong>DTO (Data Transfer Object)</strong> carries data between client and server — never expose the entity directly.</li>
+<li>Hides internal fields (passwords, audit columns), avoids lazy-loading serialization issues, lets API shape evolve independently of DB schema.</li>
+</ul>
+<pre><span class="k">public record</span> StudentDto(
+        Long id,
+        String name,
+        String email) { }   <span class="c">// Java record = immutable DTO</span></pre>
+</div>
+<div>
+<h3>14.2 Entity ↔ DTO Mapping</h3>
+<pre><span class="c">// Manual mapping (simple & explicit)</span>
+<span class="k">public</span> StudentDto toDto(Student s) {
+    <span class="k">return new</span> StudentDto(
+        s.getId(), s.getName(), s.getEmail());
+}</pre>
+<p>For big projects use <strong>MapStruct</strong> (compile-time, fast) or ModelMapper (reflection-based).</p>
+<pre><span class="a">@Mapper</span>(componentModel = <span class="s">"spring"</span>)
+<span class="k">public interface</span> StudentMapper {
+    StudentDto toDto(Student student);
+    Student toEntity(StudentDto dto);
+}</pre>
+</div>
+</div>
+
+<h3>14.3 Lombok — kill the boilerplate</h3>
+<table>
+<tr><th>Annotation</th><th>Generates</th></tr>
+<tr><td><code>@Getter / @Setter</code></td><td>Getters / setters for all fields</td></tr>
+<tr><td><code>@NoArgsConstructor / @AllArgsConstructor</code></td><td>Constructors</td></tr>
+<tr><td><code>@ToString / @EqualsAndHashCode</code></td><td>toString(), equals(), hashCode()</td></tr>
+<tr><td><code>@Data</code></td><td>All of the above (getter+setter+toString+equals+requiredArgsCtor)</td></tr>
+<tr><td><code>@Builder</code></td><td>Fluent builder: <code>Student.builder().name("Aman").build()</code></td></tr>
+<tr><td><code>@Slf4j</code></td><td>A ready <code>log</code> field for logging</td></tr>
+</table>
+<pre><span class="a">@Entity</span>
+<span class="a">@Getter</span> <span class="a">@Setter</span>
+<span class="a">@NoArgsConstructor</span> <span class="a">@AllArgsConstructor</span>
+<span class="a">@Builder</span>
+<span class="k">public class</span> Student {
+    <span class="a">@Id</span> <span class="a">@GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="k">private</span> Long id;
+    <span class="k">private</span> String name;
+    <span class="k">private</span> String email;
+}</pre>
+<div class="box redline">
+<p style="margin:0"><em class="note">Caution:</em> avoid <code>@Data</code> on JPA entities — its <code>equals/hashCode/toString</code> can trigger lazy loading &amp; recursion. Prefer <code>@Getter @Setter</code>.</p>
+</div>
+</section>
+
+<!-- ============ 15 ============ -->
+<section id="s15">
+<h2><span class="num">15.</span> VALIDATION</h2>
+
+<p>Add <code>spring-boot-starter-validation</code> → Bean Validation (Jakarta Validation with Hibernate Validator).</p>
+
+<div class="cols">
+<div>
+<h3>15.1 Annotate the DTO</h3>
+<pre><span class="k">public class</span> StudentRequest {
+
+    <span class="a">@NotBlank</span>(message = <span class="s">"Name is required"</span>)
+    <span class="a">@Size</span>(min = 2, max = 100)
+    <span class="k">private</span> String name;
+
+    <span class="a">@NotNull</span>
+    <span class="a">@Email</span>(message = <span class="s">"Invalid email"</span>)
+    <span class="k">private</span> String email;
+
+    <span class="a">@Min</span>(18) <span class="a">@Max</span>(60)
+    <span class="k">private int</span> age;
+}</pre>
+<h3>15.2 Trigger with @Valid</h3>
+<pre><span class="a">@PostMapping</span>
+<span class="k">public</span> Student create(
+        <span class="a">@Valid</span> <span class="a">@RequestBody</span> StudentRequest req) {
+    <span class="k">return</span> service.create(req);
+}</pre>
+<p>Invalid input → <code>MethodArgumentNotValidException</code> → <strong>400 Bad Request</strong>.</p>
+</div>
+<div>
+<h3>15.3 Common Constraints</h3>
+<table>
+<tr><th>Annotation</th><th>Checks</th></tr>
+<tr><td><code>@NotNull</code></td><td>value is not null</td></tr>
+<tr><td><code>@NotEmpty</code></td><td>not null and not empty (string/collection)</td></tr>
+<tr><td><code>@NotBlank</code></td><td>not null, not just whitespace (strings)</td></tr>
+<tr><td><code>@Size(min, max)</code></td><td>length / collection size range</td></tr>
+<tr><td><code>@Min / @Max</code></td><td>numeric bounds</td></tr>
+<tr><td><code>@Email</code></td><td>valid email format</td></tr>
+<tr><td><code>@Pattern(regexp)</code></td><td>matches regex</td></tr>
+<tr><td><code>@Past / @Future</code></td><td>date before / after now</td></tr>
+<tr><td><code>@Positive / @Negative</code></td><td>sign of number</td></tr>
+</table>
+<div class="box redline">
+<p style="margin:0"><em class="note">Interview line:</em> "@NotNull ⊂ @NotEmpty ⊂ @NotBlank — blank is the strictest for strings."</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 16 ============ -->
+<section id="s16">
+<h2><span class="num">16.</span> EXCEPTION HANDLING</h2>
+
+<h3>16.1 The pieces</h3>
+<table>
+<tr><th>Annotation</th><th>Role</th></tr>
+<tr><td><code>@ExceptionHandler</code></td><td>Handles a specific exception type (inside one controller or a global advice).</td></tr>
+<tr><td><code>@ControllerAdvice / @RestControllerAdvice</code></td><td><strong>Global</strong> exception handling across ALL controllers.</td></tr>
+<tr><td><code>@ResponseStatus</code></td><td>Maps an exception class to an HTTP status.</td></tr>
+<tr><td><code>ResponseEntity</code></td><td>Full control over status + headers + body.</td></tr>
+</table>
+
+<h3>16.2 Custom Exception + Global Handler</h3>
+<div class="cols">
+<div>
+<pre><span class="c">// 1. Custom exception</span>
+<span class="k">public class</span> ResourceNotFoundException
+        <span class="k">extends</span> RuntimeException {
+    <span class="k">public</span> ResourceNotFoundException(String msg) {
+        <span class="k">super</span>(msg);
+    }
+}
+
+<span class="c">// 2. Throw from service</span>
+Student s = repo.findById(id)
+    .orElseThrow(() -&gt; <span class="k">new</span> ResourceNotFoundException(
+        <span class="s">"Student not found with id: "</span> + id));</pre>
+</div>
+<div>
+<pre><span class="c">// 3. Global handler</span>
+<span class="a">@RestControllerAdvice</span>
+<span class="k">public class</span> GlobalExceptionHandler {
+
+    <span class="a">@ExceptionHandler</span>(ResourceNotFoundException.<span class="k">class</span>)
+    <span class="k">public</span> ResponseEntity&lt;ErrorResponse&gt; handleNotFound(
+            ResourceNotFoundException ex) {
+        ErrorResponse err = <span class="k">new</span> ErrorResponse(
+            404, ex.getMessage(), LocalDateTime.now());
+        <span class="k">return new</span> ResponseEntity&lt;&gt;(err, HttpStatus.NOT_FOUND);
+    }
+
+    <span class="a">@ExceptionHandler</span>(MethodArgumentNotValidException.<span class="k">class</span>)
+    <span class="k">public</span> ResponseEntity&lt;Map&lt;String,String&gt;&gt; handleValidation(
+            MethodArgumentNotValidException ex) {
+        Map&lt;String,String&gt; errors = <span class="k">new</span> HashMap&lt;&gt;();
+        ex.getBindingResult().getFieldErrors().forEach(e -&gt;
+            errors.put(e.getField(), e.getDefaultMessage()));
+        <span class="k">return</span> ResponseEntity.badRequest().body(errors);
+    }
+
+    <span class="a">@ExceptionHandler</span>(Exception.<span class="k">class</span>)   <span class="c">// fallback</span>
+    <span class="k">public</span> ResponseEntity&lt;String&gt; handleAll(Exception ex) {
+        <span class="k">return</span> ResponseEntity.status(500)
+                             .body(<span class="s">"Something went wrong"</span>);
+    }
+}</pre>
+</div>
+</div>
+
+<h3>16.3 Error Response shape</h3>
+<pre>{
+  <span class="s">"status"</span>: 404,
+  <span class="s">"message"</span>: <span class="s">"Student not found with id: 5"</span>,
+  <span class="s">"timestamp"</span>: <span class="s">"2026-07-02T10:15:30"</span>
+}</pre>
+<div class="box redline">
+<p style="margin:0"><em class="note">Interview line:</em> "One <code>@RestControllerAdvice</code> = single source of truth for error JSON; controllers stay clean; specific handlers first, <code>Exception.class</code> as fallback."</p>
+</div>
+</section>
+
+<!-- ============ 17 ============ -->
+<section id="s17">
+<h2><span class="num">17.</span> TRANSACTIONS (@Transactional)</h2>
+
+<div class="cols">
+<div>
+<h3>17.1 What is a transaction?</h3>
+<ul>
+<li>A group of DB operations that succeed or fail <strong>as one unit</strong> (ACID: Atomicity, Consistency, Isolation, Durability).</li>
+<li><code>@Transactional</code> on a service method → Spring opens a transaction before the method and <strong>commits on success / rolls back on RuntimeException</strong>.</li>
+</ul>
+<pre><span class="a">@Service</span>
+<span class="k">public class</span> BankService {
+
+    <span class="a">@Transactional</span>
+    <span class="k">public void</span> transfer(Long from, Long to,
+                         BigDecimal amount) {
+        accountRepo.debit(from, amount);
+        accountRepo.credit(to, amount);
+        <span class="c">// if credit fails → debit is rolled back too</span>
+    }
+}</pre>
+</div>
+<div>
+<h3>17.2 Key attributes</h3>
+<table>
+<tr><th>Attribute</th><th>Meaning</th></tr>
+<tr><td><code>propagation</code></td><td>REQUIRED (default: join or create), REQUIRES_NEW (always new txn), SUPPORTS, MANDATORY, NEVER…</td></tr>
+<tr><td><code>isolation</code></td><td>READ_COMMITTED, REPEATABLE_READ, SERIALIZABLE…</td></tr>
+<tr><td><code>readOnly = true</code></td><td>Optimization hint for pure-read methods.</td></tr>
+<tr><td><code>rollbackFor</code></td><td>Also roll back for checked exceptions: <code>rollbackFor = Exception.class</code></td></tr>
+<tr><td><code>timeout</code></td><td>Fail if transaction exceeds N seconds.</td></tr>
+</table>
+</div>
+</div>
+<div class="box redline">
+<div class="box-title">Gotchas (asked a lot)</div>
+<ul style="margin-bottom:0">
+<li>Rollback happens for <strong>unchecked</strong> (RuntimeException/Error) by default — <strong>not</strong> for checked exceptions.</li>
+<li><strong>Self-invocation doesn't work</strong>: calling a @Transactional method from another method of the same class bypasses the proxy → no transaction.</li>
+<li>Works via <strong>AOP proxy</strong>, so the method must be <code>public</code>.</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ 18 ============ -->
+<section id="s18">
+<h2><span class="num">18.</span> SPRING SECURITY BASICS</h2>
+
+<div class="cols">
+<div>
+<h3>18.1 Core concepts</h3>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td><strong>Authentication</strong></td><td>WHO are you? (login — verify identity)</td></tr>
+<tr><td><strong>Authorization</strong></td><td>WHAT can you do? (roles / permissions)</td></tr>
+<tr><td><strong>Principal</strong></td><td>The currently logged-in user.</td></tr>
+<tr><td><strong>SecurityFilterChain</strong></td><td>Chain of servlet filters every request passes through.</td></tr>
+<tr><td><strong>PasswordEncoder</strong></td><td>Hashes passwords (BCrypt is standard).</td></tr>
+</table>
+<p>Just adding <code>spring-boot-starter-security</code> locks <strong>every endpoint</strong> behind HTTP Basic with a generated password.</p>
+</div>
+<div>
+<h3>18.2 Request flow</h3>
+<div class="flow vert">
+<div class="step">HTTP Request</div><div class="arr">→</div>
+<div class="step">Security Filter Chain<small>(e.g. JWT filter / login filter)</small></div><div class="arr">→</div>
+<div class="step">AuthenticationManager<small>verifies credentials</small></div><div class="arr">→</div>
+<div class="step">SecurityContext<small>holds the Principal</small></div><div class="arr">→</div>
+<div class="step">Controller</div>
+</div>
+</div>
+</div>
+
+<h3>18.3 Modern configuration (SecurityFilterChain bean)</h3>
+<pre><span class="a">@Configuration</span>
+<span class="a">@EnableWebSecurity</span>
+<span class="k">public class</span> SecurityConfig {
+
+    <span class="a">@Bean</span>
+    <span class="k">public</span> SecurityFilterChain filterChain(HttpSecurity http) <span class="k">throws</span> Exception {
+        http
+            .csrf(csrf -&gt; csrf.disable())                     <span class="c">// stateless REST API</span>
+            .authorizeHttpRequests(auth -&gt; auth
+                .requestMatchers(<span class="s">"/api/auth/**"</span>).permitAll()  <span class="c">// public: login/register</span>
+                .requestMatchers(<span class="s">"/api/admin/**"</span>).hasRole(<span class="s">"ADMIN"</span>)
+                .anyRequest().authenticated())                <span class="c">// everything else needs login</span>
+            .sessionManagement(s -&gt;
+                s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .httpBasic(Customizer.withDefaults());
+        <span class="k">return</span> http.build();
+    }
+
+    <span class="a">@Bean</span>
+    <span class="k">public</span> PasswordEncoder passwordEncoder() {
+        <span class="k">return new</span> BCryptPasswordEncoder();
+    }
+}</pre>
+
+<div class="cols">
+<div>
+<h3>18.4 Method-level security</h3>
+<pre><span class="a">@EnableMethodSecurity</span>   <span class="c">// on a config class</span>
+
+<span class="a">@PreAuthorize</span>(<span class="s">"hasRole('ADMIN')"</span>)
+<span class="k">public void</span> deleteStudent(Long id) { ... }</pre>
+</div>
+<div>
+<h3>18.5 JWT in one paragraph</h3>
+<p><strong>JWT (JSON Web Token)</strong> = <code>header.payload.signature</code>. Login once → server returns a signed token → client sends it in <code>Authorization: Bearer &lt;token&gt;</code> on every request → a filter validates the signature and sets the SecurityContext. <strong>Stateless</strong> — no server session.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ 19 ============ -->
+<section id="s19">
+<h2><span class="num">19.</span> ACTUATOR, LOGGING &amp; DEVTOOLS</h2>
+
+<h3>19.1 Actuator — production monitoring for free</h3>
+<p>Add <code>spring-boot-starter-actuator</code> → ready-made operational endpoints under <code>/actuator</code>.</p>
+<table>
+<tr><th>Endpoint</th><th>Shows</th></tr>
+<tr><td><code>/actuator/health</code></td><td>UP / DOWN status (DB, disk space…)</td></tr>
+<tr><td><code>/actuator/info</code></td><td>App info (build, git, custom)</td></tr>
+<tr><td><code>/actuator/metrics</code></td><td>JVM memory, CPU, HTTP request stats</td></tr>
+<tr><td><code>/actuator/env</code></td><td>All environment properties</td></tr>
+<tr><td><code>/actuator/beans</code></td><td>Every bean in the context</td></tr>
+<tr><td><code>/actuator/loggers</code></td><td>View / change log levels at runtime</td></tr>
+<tr><td><code>/actuator/mappings</code></td><td>All @RequestMapping endpoints</td></tr>
+</table>
+<pre><span class="c"># expose endpoints (only health is exposed by default)</span>
+management.endpoints.web.exposure.include = health,info,metrics
+management.endpoint.health.show-details = always</pre>
+
+<div class="cols">
+<div>
+<h3>19.2 Logging</h3>
+<ul>
+<li>Default: <strong>SLF4J + Logback</strong>, console output.</li>
+<li>Levels: <code>TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR</code>.</li>
+</ul>
+<pre><span class="a">@Slf4j</span>  <span class="c">// Lombok, gives you `log`</span>
+<span class="a">@Service</span>
+<span class="k">public class</span> StudentService {
+    <span class="k">public</span> Student get(Long id) {
+        log.info(<span class="s">"Fetching student id={}"</span>, id);
+        log.error(<span class="s">"Not found id={}"</span>, id);
+        ...
+    }
+}</pre>
+<pre><span class="c"># properties</span>
+logging.level.root = INFO
+logging.level.com.example.demo = DEBUG
+logging.file.name = logs/app.log</pre>
+</div>
+<div>
+<h3>19.3 DevTools</h3>
+<ul>
+<li><code>spring-boot-devtools</code> → <strong>automatic restart</strong> on code change + LiveReload for the browser.</li>
+<li>Disables template caching in dev.</li>
+<li>Automatically disabled in production (when running from a packaged jar).</li>
+</ul>
+<div class="box dashed">
+<div class="box-title">application.yml (alternative format)</div>
+<pre style="margin:0;border:none">server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/demo
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update</pre>
+<p style="margin:6px 0 0">YAML = same properties, hierarchical &amp; less repetition.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ 20 ============ -->
+<section id="s20">
+<h2><span class="num">20.</span> CACHING, SCHEDULING &amp; ASYNC</h2>
+
+<div class="cols">
+<div>
+<h3>20.1 Caching</h3>
+<pre><span class="a">@EnableCaching</span>   <span class="c">// on main / config class</span>
+
+<span class="a">@Cacheable</span>(<span class="s">"students"</span>)          <span class="c">// cache the result</span>
+<span class="k">public</span> Student getById(Long id) { ... }
+
+<span class="a">@CachePut</span>(value = <span class="s">"students"</span>, key = <span class="s">"#student.id"</span>)
+<span class="k">public</span> Student update(Student student) { ... }
+
+<span class="a">@CacheEvict</span>(value = <span class="s">"students"</span>, key = <span class="s">"#id"</span>)
+<span class="k">public void</span> delete(Long id) { ... }</pre>
+<ul>
+<li>First call hits DB, next calls served from cache.</li>
+<li>Default = in-memory ConcurrentHashMap; production → <strong>Redis / Caffeine</strong>.</li>
+</ul>
+</div>
+<div>
+<h3>20.2 Scheduling</h3>
+<pre><span class="a">@EnableScheduling</span>
+
+<span class="a">@Scheduled</span>(fixedRate = 60000)      <span class="c">// every 60 s</span>
+<span class="k">public void</span> refreshReport() { ... }
+
+<span class="a">@Scheduled</span>(cron = <span class="s">"0 0 2 * * *"</span>)   <span class="c">// 2 AM daily</span>
+<span class="k">public void</span> nightlyCleanup() { ... }</pre>
+<h3>20.3 Async</h3>
+<pre><span class="a">@EnableAsync</span>
+
+<span class="a">@Async</span>
+<span class="k">public</span> CompletableFuture&lt;Void&gt; sendEmail(String to) {
+    <span class="c">// runs on a separate thread —</span>
+    <span class="c">// caller doesn't wait</span>
+}</pre>
+</div>
+</div>
+<div class="box redline">
+<p style="margin:0"><em class="note">Common thread:</em> all three work through <strong>AOP proxies</strong> — same self-invocation gotcha as <code>@Transactional</code>.</p>
+</div>
+</section>
+
+<!-- ============ 21 ============ -->
+<section id="s21">
+<h2><span class="num">21.</span> TESTING SPRING BOOT APPS</h2>
+
+<table>
+<tr><th>Annotation</th><th>Scope</th><th>Use for</th></tr>
+<tr><td><code>@SpringBootTest</code></td><td>Full application context</td><td>Integration tests</td></tr>
+<tr><td><code>@WebMvcTest(Controller.class)</code></td><td>Only web layer (controller + MVC)</td><td>Controller tests with MockMvc</td></tr>
+<tr><td><code>@DataJpaTest</code></td><td>Only JPA layer (in-memory DB)</td><td>Repository tests</td></tr>
+<tr><td><code>@MockBean</code></td><td>Replaces a bean with a Mockito mock</td><td>Isolating layers</td></tr>
+</table>
+
+<div class="cols">
+<div>
+<h4>Unit test (service with Mockito)</h4>
+<pre><span class="a">@ExtendWith</span>(MockitoExtension.<span class="k">class</span>)
+<span class="k">class</span> StudentServiceTest {
+
+    <span class="a">@Mock</span>
+    StudentRepository repo;
+
+    <span class="a">@InjectMocks</span>
+    StudentService service;
+
+    <span class="a">@Test</span>
+    <span class="k">void</span> getById_returnsStudent() {
+        when(repo.findById(1L))
+          .thenReturn(Optional.of(<span class="k">new</span> Student(1L, <span class="s">"Aman"</span>)));
+
+        Student s = service.getById(1L);
+
+        assertEquals(<span class="s">"Aman"</span>, s.getName());
+        verify(repo).findById(1L);
+    }
+}</pre>
+</div>
+<div>
+<h4>Controller test (MockMvc)</h4>
+<pre><span class="a">@WebMvcTest</span>(StudentController.<span class="k">class</span>)
+<span class="k">class</span> StudentControllerTest {
+
+    <span class="a">@Autowired</span>
+    MockMvc mockMvc;
+
+    <span class="a">@MockBean</span>
+    StudentService service;
+
+    <span class="a">@Test</span>
+    <span class="k">void</span> getStudent_returns200() <span class="k">throws</span> Exception {
+        when(service.getById(1L))
+          .thenReturn(<span class="k">new</span> Student(1L, <span class="s">"Aman"</span>));
+
+        mockMvc.perform(get(<span class="s">"/api/students/1"</span>))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(<span class="s">"$.name"</span>).value(<span class="s">"Aman"</span>));
+    }
+}</pre>
+</div>
+</div>
+<div class="box redline">
+<p style="margin:0"><em class="note">Test pyramid:</em> many fast unit tests → some slice tests (@WebMvcTest / @DataJpaTest) → few full @SpringBootTest integration tests.</p>
+</div>
+</section>
+
+<!-- ============ 22 ============ -->
+<section id="s22">
+<h2><span class="num">22.</span> MICROSERVICES — QUICK INTRO</h2>
+
+<div class="cols">
+<div>
+<h3>22.1 Monolith vs Microservices</h3>
+<table>
+<tr><th>Aspect</th><th>Monolith</th><th>Microservices</th></tr>
+<tr><td>Deployment</td><td>One big unit</td><td>Independent small services</td></tr>
+<tr><td>Scaling</td><td>Scale everything</td><td>Scale only what's hot</td></tr>
+<tr><td>Tech stack</td><td>One stack</td><td>Per-service choice</td></tr>
+<tr><td>Failure</td><td>One bug can sink all</td><td>Isolated failures</td></tr>
+<tr><td>Complexity</td><td>Simple ops</td><td>Distributed-system complexity</td></tr>
+</table>
+</div>
+<div>
+<h3>22.2 Common building blocks (Spring Cloud)</h3>
+<table>
+<tr><th>Concern</th><th>Tool</th></tr>
+<tr><td>API Gateway</td><td>Spring Cloud Gateway</td></tr>
+<tr><td>Service Discovery</td><td>Eureka / Consul</td></tr>
+<tr><td>Config management</td><td>Spring Cloud Config</td></tr>
+<tr><td>Inter-service calls</td><td>OpenFeign / RestClient / WebClient</td></tr>
+<tr><td>Resilience</td><td>Resilience4j (circuit breaker, retry)</td></tr>
+<tr><td>Messaging</td><td>Kafka / RabbitMQ</td></tr>
+<tr><td>Tracing</td><td>Micrometer Tracing + Zipkin</td></tr>
+</table>
+</div>
+</div>
+<div class="flow">
+<div class="step">Client</div><div class="arr">→</div>
+<div class="step">API Gateway</div><div class="arr">→</div>
+<div class="step">Student Service<small>(own DB)</small></div><div class="arr">↔ Feign / Kafka ↔</div>
+<div class="step">Course Service<small>(own DB)</small></div>
+</div>
+<p><em class="note">Rule of thumb:</em> one service = one business capability = one database.</p>
+</section>
+
+<!-- ============ 23 ============ -->
+<section id="s23">
+<h2><span class="num">23.</span> INTERVIEW RAPID-FIRE SHEET</h2>
+
+<table>
+<tr><th>Question</th><th>One-line answer</th></tr>
+<tr><td>What does <code>@SpringBootApplication</code> contain?</td><td><code>@Configuration</code> + <code>@EnableAutoConfiguration</code> + <code>@ComponentScan</code>.</td></tr>
+<tr><td><code>@Controller</code> vs <code>@RestController</code>?</td><td>RestController = Controller + ResponseBody (returns JSON, not a view).</td></tr>
+<tr><td><code>@Component</code> vs <code>@Bean</code>?</td><td>@Component = class-level auto-detection; @Bean = method-level manual definition (for third-party classes).</td></tr>
+<tr><td>Default bean scope?</td><td>Singleton — one instance per IoC container.</td></tr>
+<tr><td>Field vs Constructor injection?</td><td>Constructor is preferred: immutability, mandatory deps, easy testing.</td></tr>
+<tr><td><code>@Qualifier</code> vs <code>@Primary</code>?</td><td>Primary = default among candidates; Qualifier = pick a specific one at injection point.</td></tr>
+<tr><td>How to change server port?</td><td><code>server.port=9090</code> in application.properties.</td></tr>
+<tr><td><code>@PathVariable</code> vs <code>@RequestParam</code>?</td><td>PathVariable reads from URL path (<code>/users/5</code>); RequestParam from query string (<code>?id=5</code>).</td></tr>
+<tr><td>PUT vs PATCH?</td><td>PUT replaces the whole resource; PATCH updates part of it.</td></tr>
+<tr><td>JPA vs Hibernate?</td><td>JPA is the specification; Hibernate is an implementation of it.</td></tr>
+<tr><td><code>findById</code> vs <code>getReferenceById</code>?</td><td>findById hits DB, returns Optional; getReferenceById returns a lazy proxy.</td></tr>
+<tr><td>What is the N+1 problem?</td><td>1 query for parents + N queries for children; fix with JOIN FETCH / @EntityGraph.</td></tr>
+<tr><td>When does <code>@Transactional</code> roll back?</td><td>On unchecked exceptions by default; use rollbackFor for checked ones.</td></tr>
+<tr><td>Authentication vs Authorization?</td><td>Who you are vs what you're allowed to do.</td></tr>
+<tr><td>How does Boot know what to auto-configure?</td><td>AutoConfiguration.imports file + @Conditional checks on the classpath.</td></tr>
+<tr><td>Only expose health &amp; metrics endpoints?</td><td><code>management.endpoints.web.exposure.include=health,metrics</code></td></tr>
+<tr><td>How to run different configs per env?</td><td>Profiles: application-dev.properties + <code>spring.profiles.active=dev</code>.</td></tr>
+<tr><td>Embedded servers supported?</td><td>Tomcat (default), Jetty, Undertow.</td></tr>
+<tr><td>How to make a jar executable?</td><td><code>mvn clean package</code> → <code>java -jar app.jar</code> (Boot's fat/uber jar).</td></tr>
+<tr><td>@MockBean vs @Mock?</td><td>@MockBean replaces a bean inside the Spring context; @Mock is plain Mockito (no context).</td></tr>
+</table>
+
+<div class="footer-note">End of Spring Boot Handbook — Part 1 &amp; Part 2<br>Revise the rapid-fire sheet the night before the interview. Good luck!</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>
