@@ -3,62 +3,32 @@
    ============================================================ */
 
 /* ── CSS Variables ────────────────────────────────────────── */
+/* All colors come from css/tokens.css (dark default + light).
+   These are app-level aliases so existing rules read naturally.
+   Difficulty colors (--easy/--medium/--hard + *-bg) also come
+   from tokens.css. */
 :root {
-  /* Light theme */
-  --bg:          #f5f7fa;
-  --surface:     #ffffff;
-  --surface-alt: #f0f2f6;
-  --border:      #e2e6ea;
-  --text:        #1a1d23;
-  --text-muted:  #6b7280;
-  --primary:     #2563eb;
-  --primary-bg:  #eff6ff;
-  --sidebar-bg:  #1e293b;
-  --sidebar-text:#e2e8f0;
-  --sidebar-muted:#94a3b8;
-  --sidebar-hover:#334155;
-  --sidebar-active:#3b82f6;
-  --sidebar-active-bg:#1d3461;
-  --shadow:      0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-  --shadow-md:   0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --bg:          var(--bg-primary);
+  --surface:     var(--bg-secondary);
+  --surface-alt: var(--bg-tertiary);
+  --border:      var(--border-tertiary);
+  --text:        var(--text-primary);
+  --text-muted:  var(--text-secondary);
+  --primary:     var(--accent);
+  --primary-bg:  var(--accent-bg);
+  --sidebar-bg:  var(--bg-secondary);
+  --sidebar-text: var(--text-primary);
+  --sidebar-muted: var(--text-secondary);
+  --sidebar-hover: var(--bg-tertiary);
+  --sidebar-active: var(--accent);
+  --sidebar-active-bg: var(--accent-bg);
   --radius:      10px;
-  --radius-sm:   6px;
+  --radius-sm:   var(--radius-md);
   --transition:  0.2s ease;
 
-  /* Difficulty colors */
-  --easy:   #16a34a;
-  --easy-bg:#dcfce7;
-  --medium: #d97706;
-  --medium-bg:#fef3c7;
-  --hard:   #dc2626;
-  --hard-bg:#fee2e2;
-
-  /* Sidebar width */
+  /* Layout */
   --sidebar-w: 260px;
-  --topbar-h:  56px;
-}
-
-[data-theme="dark"] {
-  --bg:          #0f172a;
-  --surface:     #1e293b;
-  --surface-alt: #273449;
-  --border:      #334155;
-  --text:        #e2e8f0;
-  --text-muted:  #94a3b8;
-  --primary:     #60a5fa;
-  --primary-bg:  #1e3a5f;
-  --sidebar-bg:  #0d1b2e;
-  --sidebar-text:#e2e8f0;
-  --sidebar-muted:#64748b;
-  --sidebar-hover:#1e293b;
-  --sidebar-active:#60a5fa;
-  --sidebar-active-bg:#1a3152;
-  --shadow:      0 1px 3px rgba(0,0,0,.3);
-  --shadow-md:   0 4px 6px rgba(0,0,0,.3);
-
-  --easy-bg: #14532d;
-  --medium-bg: #78350f;
-  --hard-bg:  #7f1d1d;
+  --topbar-h:  var(--site-topbar-h);
 }
 
 /* ── Reset & Base ─────────────────────────────────────────── */
@@ -67,8 +37,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-               "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.6;
   background: var(--bg);
@@ -92,11 +61,12 @@ body {
   gap: 12px;
   padding: 0 16px;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  border-bottom: 1px solid var(--border-tertiary);
+  box-shadow: var(--shadow-sm);
 }
 
-#topbar .logo { font-weight: 700; font-size: 16px; color: var(--sidebar-text); flex: 1; }
-#topbar .logo span { color: var(--sidebar-active); }
+#topbar .logo { font-weight: 700; font-size: 16px; color: var(--sidebar-text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#topbar .logo span { color: var(--accent); }
 
 /* Hamburger */
 #hamburger {
@@ -133,12 +103,12 @@ body {
   z-index: 200;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid rgba(255,255,255,.05);
+  border-right: 1px solid var(--border-tertiary);
 }
 
 #sidebar-header {
   padding: 16px 16px 12px;
-  border-bottom: 1px solid rgba(255,255,255,.07);
+  border-bottom: 1px solid var(--border-tertiary);
 }
 
 #sidebar-header h3 {
@@ -179,14 +149,31 @@ body {
 .nav-label { flex: 1; line-height: 1.3; }
 .nav-count {
   font-size: 11px;
-  background: rgba(255,255,255,.1);
+  background: var(--bg-tertiary);
   border-radius: 99px;
   padding: 1px 7px;
   min-width: 24px;
   text-align: center;
   color: var(--sidebar-muted);
 }
-.nav-btn.active .nav-count { background: rgba(96,165,250,.15); color: var(--sidebar-active); }
+.nav-btn.active .nav-count { background: var(--accent-bg); color: var(--sidebar-active); }
+
+/* Topic-handbook links section (bottom of sidebar) */
+.sidebar-section {
+  border-top: 1px solid var(--border-tertiary);
+  padding: 12px 0 16px;
+}
+.sidebar-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--sidebar-muted);
+  padding: 4px 16px 8px;
+}
+.sidebar-section ul { list-style: none; }
+a.nav-btn { text-decoration: none; }
+a.nav-btn .nav-ext { font-size: 11px; color: var(--sidebar-muted); }
 
 /* Main content */
 #main {
@@ -231,7 +218,7 @@ body {
 }
 .search-wrap input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 .search-wrap input::placeholder { color: var(--text-muted); }
 .search-icon {
@@ -281,10 +268,10 @@ body {
   transition: all var(--transition);
 }
 .diff-pill:hover { border-color: var(--primary); color: var(--primary); }
-.diff-pill.active[data-difficulty="all"]    { background: var(--primary); border-color: var(--primary); color: #fff; }
-.diff-pill.active[data-difficulty="easy"]   { background: var(--easy); border-color: var(--easy); color: #fff; }
-.diff-pill.active[data-difficulty="medium"] { background: var(--medium); border-color: var(--medium); color: #fff; }
-.diff-pill.active[data-difficulty="hard"]   { background: var(--hard); border-color: var(--hard); color: #fff; }
+.diff-pill.active[data-difficulty="all"]    { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+.diff-pill.active[data-difficulty="easy"]   { background: var(--easy-bg);   border-color: var(--easy);   color: var(--easy); }
+.diff-pill.active[data-difficulty="medium"] { background: var(--medium-bg); border-color: var(--medium); color: var(--medium); }
+.diff-pill.active[data-difficulty="hard"]   { background: var(--hard-bg);   border-color: var(--hard);   color: var(--hard); }
 
 /* Action buttons */
 .action-btns {
@@ -326,7 +313,7 @@ body {
 }
 #progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  background: var(--accent);
   border-radius: 99px;
   transition: width .4s ease;
   width: 0%;
@@ -370,7 +357,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 8px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition), border-color var(--transition);
   overflow: hidden;
 }
@@ -415,14 +402,10 @@ body {
   word-break: break-word;
 }
 .question-text mark {
-  background: #fef08a;
-  color: #713f12;
+  background: var(--mark-bg);
+  color: var(--mark-text);
   border-radius: 2px;
   padding: 0 1px;
-}
-[data-theme="dark"] .question-text mark {
-  background: #854d0e;
-  color: #fef9c3;
 }
 
 .accordion-arrow {
@@ -504,7 +487,7 @@ body {
   margin-bottom: 2px;
 }
 .accordion-content code {
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12.5px;
   background: var(--surface-alt);
   color: var(--primary);
@@ -551,16 +534,15 @@ body {
   margin: 0;
   overflow-x: auto;
   padding: 14px 16px;
-  background: #0d1117;
+  background: var(--code-bg);
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
-[data-theme="light"] .code-block pre { background: #1e1e2e; }
 
 .code-block code {
-  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.6;
-  color: #cdd6f4;
+  color: var(--code-text);
   background: none;
   padding: 0;
 }
@@ -623,19 +605,7 @@ body {
   text-decoration: underline;
 }
 
-/* ── Theme toggle / other topbar controls ─────────────────── */
-#theme-toggle {
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.15);
-  color: var(--sidebar-text);
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  white-space: nowrap;
-  transition: background var(--transition);
-}
-#theme-toggle:hover { background: rgba(255,255,255,.18); }
+/* Theme toggle button styling comes from .theme-btn in components.css */
 
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -662,6 +632,11 @@ body {
   .answer-table th, .answer-table td { padding: 5px 8px; }
 }
 
+@media (max-width: 560px) {
+  /* Handbook links remain reachable via the sidebar drawer */
+  #topbar .topbar-nav { display: none; }
+}
+
 @media (max-width: 480px) {
   .diff-pill { padding: 4px 10px; font-size: 11.5px; }
   .accordion-header { padding: 11px 12px; }
@@ -673,7 +648,7 @@ body {
 /* ── Scrollbar (webkit) ───────────────────────────────────── */
 #sidebar::-webkit-scrollbar { width: 4px; }
 #sidebar::-webkit-scrollbar-track { background: transparent; }
-#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 99px; }
 
 .accordion-body::-webkit-scrollbar { height: 4px; }
 .code-block pre::-webkit-scrollbar { height: 4px; }

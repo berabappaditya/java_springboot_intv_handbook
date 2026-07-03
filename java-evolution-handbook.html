@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Evolution Handbook — Java 8 to 25 &amp; Interview Guide</title>
+<meta name="description" content="The complete Java Evolution handbook: every version from Java 8 to Java 25 with features, code examples, impact, and a full backend interview guide.">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<script src="js/theme.js"></script>
+<style>
+/* Page-local variable names are remapped onto the shared design
+   tokens (css/tokens.css) so both themes flow through untouched. */
+:root{
+  --purple:var(--accent);
+  --purple-2:var(--accent-strong);
+  --deep:var(--accent-strong);
+  --ink:var(--text-primary);
+  --bg:var(--bg-primary);
+  --lav:var(--accent-bg);
+  --lav-2:var(--bg-tertiary);
+  --card:var(--bg-secondary);
+  --line:var(--border-tertiary);
+  --slate:var(--text-secondary);
+  --yellow:var(--warning);
+  --yellow-d:var(--warning);
+  --green:var(--success);
+  --code-tx:var(--code-text);
+  --r:16px;
+  --disp:var(--font-sans);
+  --body:var(--font-sans);
+  --mono:var(--font-mono);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:140px}
+/* let wide pre blocks scroll inside grid columns instead of widening the page */
+.hero>*,.fblock>*,.vgrid>*,.mm-grid>*,.strategy>*,.faq>details{min-width:0}
+body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.65}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+img{max-width:100%}
+code{font-family:var(--mono);font-size:.86em;background:var(--lav);padding:1px 6px;border-radius:6px;color:var(--deep)}
+
+/* ============ NAV ============ */
+.nav{position:sticky;top:var(--site-topbar-h);z-index:60;background:var(--bg-secondary);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1140px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:14px}
+.brand{font-family:var(--disp);font-weight:900;letter-spacing:-.02em;font-size:1rem;display:flex;align-items:center;gap:9px;white-space:nowrap}
+.brand .cup{width:26px;height:26px;border-radius:8px;background:var(--purple);color:var(--accent-contrast);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.72rem;font-weight:600}
+.chapters{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none;padding:2px}
+.chapters::-webkit-scrollbar{display:none}
+.chapters a{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--slate);text-decoration:none;padding:6px 11px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.chapters a:hover{color:var(--purple);border-color:var(--line);background:var(--bg-tertiary)}
+.chapters a:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+
+/* ============ HERO ============ */
+.hero{max-width:1140px;margin:0 auto;padding:60px 24px 30px;display:grid;grid-template-columns:1.35fr .65fr;gap:44px}
+.series-chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;font-weight:600;background:var(--bg-tertiary);color:var(--text-primary);padding:5px 14px;border-radius:999px;letter-spacing:.08em}
+.series-chip b{color:var(--yellow)}
+.hero h1{font-family:var(--disp);font-weight:900;font-size:clamp(2.6rem,6vw,4.6rem);line-height:.98;letter-spacing:-.035em;margin:18px 0 8px}
+.hero h1 .accent{color:var(--purple)}
+.hero .sub{font-family:var(--disp);font-weight:700;color:var(--deep);font-size:1.08rem;border-bottom:3px solid var(--yellow);display:inline-block;padding-bottom:4px}
+.hero .lede{color:var(--slate);margin-top:16px;font-size:1.03rem;max-width:52ch}
+.hero-cta{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{font-family:var(--disp);font-weight:700;font-size:.92rem;padding:12px 22px;border-radius:12px;text-decoration:none;border:2px solid var(--border-primary);transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.solid{background:var(--purple);border-color:var(--purple);color:var(--accent-contrast)}
+.btn.solid:hover{background:var(--deep);border-color:var(--deep)}
+.btn.ghost{color:var(--ink)}
+.btn.ghost:hover{border-color:var(--purple);color:var(--purple)}
+.btn:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+.side-stack{display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow-sm)}
+.panel h4{font-family:var(--disp);font-weight:800;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-contrast);background:var(--purple);display:inline-block;padding:4px 12px;border-radius:8px;margin-bottom:14px}
+.panel.green h4{background:var(--green)}
+.check{list-style:none;display:grid;gap:8px}
+.check li{position:relative;padding-left:26px;font-size:.9rem}
+.check li::before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--lav);color:var(--purple);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.panel.green .check li::before{background:var(--success-bg);color:var(--green)}
+.real{font-family:var(--disp);font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:10px;margin:4px 0}
+.real .ok{color:var(--green)}
+.panel .fine{font-size:.82rem;color:var(--slate);border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}
+
+/* ============ CHAPTER SHELL ============ */
+.chapter{max-width:1140px;margin:0 auto;padding:56px 24px 8px}
+.ch-head{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:10px}
+.page-chip{font-family:var(--mono);font-weight:600;font-size:.78rem;background:var(--bg-tertiary);color:var(--yellow);padding:6px 13px;border-radius:10px;letter-spacing:.06em;flex:none;margin-top:10px}
+.ch-head h2{font-family:var(--disp);font-weight:900;font-size:clamp(1.8rem,4vw,2.7rem);letter-spacing:-.03em;line-height:1.05}
+.ch-head h2 .lts-inline{display:inline-block;vertical-align:middle;font-size:.42em;background:var(--purple);color:var(--accent-contrast);padding:4px 12px;border-radius:9px;letter-spacing:.05em;margin-left:10px;transform:translateY(-4px)}
+.ch-head .tag{width:100%;font-family:var(--disp);font-weight:700;color:var(--purple);font-size:1rem;margin-top:2px}
+.ch-lede{color:var(--slate);max-width:70ch;margin-bottom:26px}
+
+/* timeline (chapter 1) */
+.tl{position:relative;margin:10px 0 30px}
+.tl-row{display:grid;grid-template-columns:150px 1fr;gap:22px;padding:0 0 26px 0}
+.tl-ver{text-align:right}
+.tl-ver .v{font-family:var(--disp);font-weight:900;font-size:1.25rem;color:var(--deep)}
+.tl-ver .y{font-family:var(--mono);font-size:.78rem;color:var(--slate);display:block}
+.tl-ver .lts-mini{display:inline-block;font-family:var(--mono);font-size:.62rem;font-weight:600;background:var(--purple);color:var(--accent-contrast);padding:1px 8px;border-radius:6px;margin-top:3px}
+.tl-body{position:relative;padding-left:36px}
+.tl-body::after{content:"";position:absolute;left:7px;top:16px;bottom:-22px;width:2px;background:var(--line)}
+.tl-row:last-child .tl-body::after{display:none}
+.tl-body::before{content:"";position:absolute;left:3px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--bg-primary);border:2px solid var(--purple);z-index:1}
+.tl-row.milestone .tl-body::before{background:var(--yellow);border-color:var(--deep);width:12px;height:12px;left:2px;top:7px}
+.tl-body h3{font-family:var(--disp);font-weight:800;font-size:1.02rem}
+.tl-body ul{list-style:none;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px 16px}
+.tl-body li{font-size:.86rem;color:var(--slate);position:relative;padding-left:14px}
+.tl-body li::before{content:"•";position:absolute;left:0;color:var(--purple);font-weight:700}
+.quote-band{background:var(--bg-tertiary);color:var(--text-primary);border-radius:var(--r);padding:22px 30px;text-align:center;font-family:var(--disp);font-weight:800;font-size:1.15rem;letter-spacing:.01em;margin-top:6px}
+.quote-band span{color:var(--yellow)}
+
+/* feature blocks (Java 8 chapters, Java 17) */
+.fblock{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;margin-bottom:18px;display:grid;grid-template-columns:250px 1fr;gap:26px;box-shadow:var(--shadow-sm)}
+.fblock .fnum{font-family:var(--disp);font-weight:900;font-size:1rem;width:34px;height:34px;border-radius:10px;background:var(--purple);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.fblock h3{font-family:var(--disp);font-weight:800;font-size:1.18rem;letter-spacing:-.01em;background:var(--lav);display:inline-block;padding:5px 14px;border-radius:9px;color:var(--deep)}
+.fblock .fdesc{color:var(--slate);font-size:.92rem;margin-top:12px}
+.fbody .lbl{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;background:var(--purple);color:var(--accent-contrast);display:inline-block;padding:3px 11px;border-radius:7px;margin-bottom:10px}
+.fbody .lbl.alt{background:var(--deep)}
+.fbody ul.plain{list-style:none;display:grid;gap:6px;margin-bottom:14px}
+.fbody ul.plain li{font-size:.9rem;position:relative;padding-left:16px}
+.fbody ul.plain li::before{content:"›";position:absolute;left:0;color:var(--purple);font-weight:700}
+.takeaway{display:flex;align-items:center;gap:10px;background:var(--lav-2);border:1px dashed var(--line);border-radius:11px;padding:11px 16px;font-size:.88rem;font-weight:600;color:var(--deep);margin-top:14px}
+.takeaway::before{content:"✦";color:var(--purple)}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.flow .fstep{background:var(--lav-2);border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-size:.78rem;font-weight:600;text-align:center;color:var(--deep)}
+.flow .arr{color:var(--purple);font-weight:800}
+
+pre{background:var(--code-bg);color:var(--code-tx);font-family:var(--mono);font-size:.8rem;line-height:1.6;border-radius:12px;padding:16px 18px;overflow-x:auto;margin-top:4px}
+pre .c{color:var(--code-comment)}pre .k{color:var(--code-keyword);font-weight:600}pre .s{color:var(--code-string)}pre .n{color:var(--code-accent)}
+
+/* version panels (9/10/11, 12-16, 18-21, 22-25) */
+.vpanel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+.vpanel .vtop{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.vpanel .vtop h3{font-family:var(--disp);font-weight:900;font-size:1.5rem;letter-spacing:-.02em}
+.vpanel .vtop .y{font-family:var(--mono);color:var(--slate);font-size:.85rem}
+.vpanel .vtop .lts-badge{font-family:var(--mono);font-size:.68rem;font-weight:600;background:var(--purple);color:var(--accent-contrast);padding:3px 10px;border-radius:7px;letter-spacing:.08em}
+.vpanel .vtop .lts-badge.hot{background:var(--warning-bg);color:var(--warning)}
+.vpanel .vsub{color:var(--slate);font-size:.94rem;margin-bottom:18px}
+.vgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:26px}
+.hi-list{list-style:none;display:grid;gap:13px}
+.hi-list li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.hi-list .ic{width:34px;height:34px;border-radius:10px;background:var(--lav);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex:none}
+.hi-list b{font-weight:600;color:var(--deep)}
+.hi-list .d{display:block;font-size:.86rem;color:var(--slate)}
+.impact{background:var(--lav-2);border:1px solid var(--line);border-radius:12px;padding:18px 20px;height:fit-content}
+.impact h5{font-family:var(--disp);font-weight:800;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.impact ul{list-style:none;display:grid;gap:7px}
+.impact li{position:relative;padding-left:24px;font-size:.87rem}
+.impact li::before{content:"✓";position:absolute;left:0;top:1px;width:16px;height:16px;border-radius:50%;background:var(--bg-secondary);border:1px solid var(--line);color:var(--purple);font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.why-strip{background:var(--bg-tertiary);color:var(--text-primary);border-radius:var(--r);padding:18px 26px;display:flex;align-items:center;gap:10px 26px;flex-wrap:wrap;margin-bottom:18px}
+.why-strip .t{font-family:var(--disp);font-weight:800;font-size:1rem;display:flex;align-items:center;gap:10px}
+.why-strip .t::before{content:"💡"}
+.why-strip .items{display:flex;gap:8px 20px;flex-wrap:wrap;margin-left:auto}
+.why-strip .items span{font-size:.84rem;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.why-strip .items span::before{content:"✓";color:var(--yellow);font-weight:700}
+
+@media (max-width:940px){
+  .hero{grid-template-columns:1fr;padding-top:40px}
+  .fblock{grid-template-columns:1fr;gap:14px}
+  .vgrid{grid-template-columns:1fr}
+  .tl-row{grid-template-columns:88px 1fr;gap:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="site-topbar">
+  <div class="site-topbar-in">
+    <a class="topbar-brand" href="index.html">☕ Java &amp; <span class="accent">Spring Boot</span> Handbook</a>
+    <nav class="topbar-nav" aria-label="Topic handbooks">
+      <a class="topbar-link" href="index.html">Home</a>
+      <a class="topbar-link" href="java_collections_framework.html">Collections</a>
+      <a class="topbar-link active" href="java-evolution-handbook.html" aria-current="page">Java Evolution</a>
+      <a class="topbar-link" href="spring-boot-handbook.html">Spring Boot</a>
+    </nav>
+    <button id="theme-toggle" class="theme-btn" aria-label="Toggle dark/light theme">🌙 Dark</button>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Chapters">
+  <div class="nav-in">
+    <span class="brand"><span class="cup">{ }</span> Java Evolution Handbook</span>
+    <div class="chapters">
+      <a href="#ch1">1 Overview</a>
+      <a href="#ch2">2 Java 8 · I</a>
+      <a href="#ch3">3 Java 8 · II</a>
+      <a href="#ch4">4 Java 9–11</a>
+      <a href="#ch5">5 Java 12–16</a>
+      <a href="#ch6">6 Java 17</a>
+      <a href="#ch7">7 Java 18–21</a>
+      <a href="#ch8">8 Java 22–25</a>
+      <a href="#ch9">9 Interview</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div>
+    <span class="series-chip">SERIES · <b>9 CHAPTERS</b> · COMPLETE HANDBOOK</span>
+    <h1>JAVA<br><span class="accent">EVOLUTION</span></h1>
+    <span class="sub">From Java 8 to Java 25 — A Journey of Innovation</span>
+    <p class="lede">Every version. Every feature. Every example. This handbook walks the full road from the release that made Java modern (8) to the newest long-term release (25), and finishes with the complete backend interview guide.</p>
+    <div class="hero-cta">
+      <a class="btn solid" href="#ch1">Start Chapter 1</a>
+      <a class="btn ghost" href="#ch9">Jump to Interview Guide</a>
+    </div>
+  </div>
+  <div class="side-stack">
+    <div class="panel">
+      <h4>Why upgrade?</h4>
+      <ul class="check">
+        <li>Better performance</li>
+        <li>Less boilerplate code</li>
+        <li>Modern language features</li>
+        <li>Improved GC &amp; memory</li>
+        <li>Stronger security</li>
+        <li>Better concurrency support</li>
+        <li>Easier to build &amp; maintain</li>
+      </ul>
+    </div>
+    <div class="panel green">
+      <h4>Today in the real world</h4>
+      <p style="font-size:.85rem;color:var(--slate)">Most companies are on:</p>
+      <div class="real">Java 17 LTS <span class="ok">✔</span></div>
+      <div class="real">Java 21 LTS <span class="ok">✔</span></div>
+      <p class="fine">Some legacy applications still run on Java 8.</p>
+    </div>
+  </div>
+</header>
+
+<!-- ================= CHAPTER 1 ================= -->
+<section class="chapter" id="ch1">
+  <div class="ch-head">
+    <span class="page-chip">1 / 9</span>
+    <div>
+      <h2>The Journey at a Glance</h2>
+      <div class="tag">From Java 8 to Java 25 — one timeline, eleven years of innovation</div>
+    </div>
+  </div>
+  <p class="ch-lede">Before diving deep, see the whole road. Each stop below is expanded into its own full chapter — this is your map.</p>
+
+  <div class="tl">
+    <div class="tl-row milestone">
+      <div class="tl-ver"><span class="v">Java 8</span><span class="y">2014</span><span class="lts-mini">FOUNDATION</span></div>
+      <div class="tl-body"><h3>The foundation of modern Java</h3>
+        <ul><li>Lambdas</li><li>Streams API</li><li>Optional, Date &amp; Time API</li><li>CompletableFuture</li></ul></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-ver"><span class="v">Java 9</span><span class="y">2017</span></div>
+      <div class="tl-body"><h3>Modular &amp; maintainable</h3>
+        <ul><li>Module System (JPMS)</li><li>JShell</li><li>Factory Methods</li></ul></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-ver"><span class="v">Java 10</span><span class="y">2018</span></div>
+      <div class="tl-body"><h3>Smarter coding</h3>
+        <ul><li>Local Variable Type Inference (var)</li></ul></div>
+    </div>
+    <div class="tl-row milestone">
+      <div class="tl-ver"><span class="v">Java 11</span><span class="y">2018</span><span class="lts-mini">LTS</span></div>
+      <div class="tl-body"><h3>Enterprise ready</h3>
+        <ul><li>HTTP Client</li><li>String &amp; Files APIs</li><li>Collection Enhancements</li></ul></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-ver"><span class="v">Java 12–13</span><span class="y">2019</span></div>
+      <div class="tl-body"><h3>Polish &amp; preview</h3>
+        <ul><li>Switch Expressions (Preview)</li><li>Text Blocks (Preview)</li></ul></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-ver"><span class="v">Java 14–16</span><span class="y">2020–2021</span></div>
+      <div class="tl-body"><h3>Language made simpler</h3>
+        <ul><li>Records (Preview → Final)</li><li>Text Blocks</li><li>Pattern Matching for instanceof</li></ul></div>
+    </div>
+    <div class="tl-row milestone">
+      <div class="tl-ver"><span class="v">Java 17</span><span class="y">2021</span><span class="lts-mini">LTS</span></div>
+      <div class="tl-body"><h3>Stronger &amp; more secure</h3>
+        <ul><li>Sealed Classes</li><li>Pattern Matching</li><li>Better Encapsulation, Improved GC</li></ul></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-ver"><span class="v">Java 18–20</span><span class="y">2022–2023</span></div>
+      <div class="tl-body"><h3>Continuous improvements</h3>
+        <ul><li>Virtual Threads (Preview → Final)</li><li>Scoped Values</li><li>Simple Web Server</li></ul></div>
+    </div>
+    <div class="tl-row milestone">
+      <div class="tl-ver"><span class="v">Java 21</span><span class="y">2023</span><span class="lts-mini">LTS</span></div>
+      <div class="tl-body"><h3>Developer productivity boost</h3>
+        <ul><li>Record Patterns</li><li>Pattern Matching for switch</li><li>Sequenced Collections</li></ul></div>
+    </div>
+    <div class="tl-row milestone">
+      <div class="tl-ver"><span class="v">Java 22–25</span><span class="y">2024–2025</span></div>
+      <div class="tl-body"><h3>The road ahead</h3>
+        <ul><li>FFM API (Final)</li><li>Stream Gatherers</li><li>JVM &amp; Performance Enhancements</li><li>Latest LTS → Java 25</li></ul></div>
+    </div>
+  </div>
+  <div class="quote-band">❝ ONE LANGUAGE. <span>ENDLESS POSSIBILITIES.</span> ❞</div>
+</section>
+
+<!-- ================= CHAPTER 2 : JAVA 8 PART 1 ================= -->
+<section class="chapter" id="ch2">
+  <div class="ch-head">
+    <span class="page-chip">2 / 9</span>
+    <div>
+      <h2>Java 8 (2014) — What's New, Part 1</h2>
+      <div class="tag">The upgrade that made Java functional, expressive &amp; powerful</div>
+    </div>
+  </div>
+  <p class="ch-lede">Java 8 is the single most important release for interviews. Part 1 covers the functional core: lambdas, functional interfaces, streams, method references and default methods.</p>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">1</span>
+      <h3>Lambda Expressions</h3>
+      <p class="fdesc">Pass behavior as data — write a function inline, without a class or an anonymous type.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Syntax</span>
+      <ul class="plain">
+        <li><code>(parameters) -&gt; expression</code></li>
+        <li><code>(parameters) -&gt; { statements; }</code></li>
+        <li>No parameters: <code>() -&gt; doWork()</code></li>
+      </ul>
+      <span class="lbl alt">Example</span>
+<pre><span class="c">// Before Java 8 — anonymous class noise</span>
+Runnable r1 = <span class="k">new</span> Runnable() {
+    <span class="k">public void</span> run() { System.out.println(<span class="s">"Hello"</span>); }
+};
+
+<span class="c">// Java 8 — one line</span>
+Runnable r2 = () -&gt; System.out.println(<span class="s">"Hello"</span>);
+
+Comparator&lt;User&gt; byAge = (a, b) -&gt; a.getAge() - b.getAge();</pre>
+      <div class="takeaway">Less boilerplate. Behavior becomes a value you can pass around.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">2</span>
+      <h3>Functional Interfaces</h3>
+      <p class="fdesc">Interfaces with exactly one abstract method — the target type every lambda needs.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">The Big Four</span>
+      <ul class="plain">
+        <li><b>Predicate&lt;T&gt;</b> — takes T, returns <code>boolean</code> → test something</li>
+        <li><b>Function&lt;T,R&gt;</b> — takes T, returns R → transform something</li>
+        <li><b>Consumer&lt;T&gt;</b> — takes T, returns nothing → act on something</li>
+        <li><b>Supplier&lt;T&gt;</b> — takes nothing, returns T → provide something</li>
+      </ul>
+      <span class="lbl alt">Example</span>
+<pre><span class="c">// 1. Predicate — test a condition, returns boolean</span>
+Predicate&lt;String&gt; isLong = s -&gt; s.length() &gt; <span class="n">5</span>;
+isLong.test(<span class="s">"Hello"</span>);          <span class="c">// false</span>
+isLong.test(<span class="s">"Hello Java"</span>);     <span class="c">// true</span>
+
+<span class="c">// 2. Function — transform T into R</span>
+Function&lt;String, Integer&gt; length = s -&gt; s.length();
+length.apply(<span class="s">"Java"</span>);          <span class="c">// 4</span>
+
+<span class="c">// 3. Consumer — accept a value, return nothing</span>
+Consumer&lt;String&gt; print = s -&gt; System.out.println(s);
+print.accept(<span class="s">"Hello"</span>);         <span class="c">// prints: Hello</span>
+
+<span class="c">// 4. Supplier — provide a value, take nothing</span>
+Supplier&lt;Double&gt; random = () -&gt; Math.random();
+random.get();                  <span class="c">// e.g. 0.7431</span></pre>
+      <div class="takeaway">Interview favourite: know all four signatures cold — and BiFunction, UnaryOperator as bonus.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">3</span>
+      <h3>Streams API</h3>
+      <p class="fdesc">Declarative data processing: describe <em>what</em> you want, not <em>how</em> to loop for it.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Pipeline Anatomy</span>
+      <div class="flow">
+        <span class="fstep">Source<br>list.stream()</span><span class="arr">→</span>
+        <span class="fstep">Intermediate ops<br>filter · map · sorted · distinct</span><span class="arr">→</span>
+        <span class="fstep">Terminal op<br>collect · forEach · reduce · count</span>
+      </div>
+      <span class="lbl alt" style="margin-top:14px">Example</span>
+<pre><span class="c">// Before Java 8 — loop + if + temp list + sort</span>
+List&lt;String&gt; result = <span class="k">new</span> ArrayList&lt;&gt;();
+<span class="k">for</span> (User u : users) {
+    <span class="k">if</span> (u.isActive()) {
+        result.add(u.getName());
+    }
+}
+Collections.sort(result);
+
+<span class="c">// Java 8 — the same logic as one readable pipeline</span>
+List&lt;String&gt; result = users.stream()
+    .filter(User::isActive)      <span class="c">// keep active users</span>
+    .map(User::getName)          <span class="c">// User → String</span>
+    .sorted()                    <span class="c">// alphabetical</span>
+    .collect(Collectors.toList());</pre>
+      <ul class="plain" style="margin-top:12px">
+        <li>Lazy — nothing runs until the terminal operation</li>
+        <li>One-time use — a consumed stream cannot be reused</li>
+        <li>Doesn't modify the source collection</li>
+      </ul>
+      <div class="takeaway">Streams process data; Collections store data. Say this sentence in every interview.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">4</span>
+      <h3>Method References</h3>
+      <p class="fdesc">A shorthand for lambdas that only call an existing method. Cleaner, and reads like English.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Four Kinds</span>
+      <ul class="plain">
+        <li>Static method → <code>Integer::parseInt</code></li>
+        <li>Instance method of an object → <code>System.out::println</code></li>
+        <li>Instance method of a type → <code>String::toUpperCase</code></li>
+        <li>Constructor → <code>ArrayList::new</code></li>
+      </ul>
+      <span class="lbl alt">Example</span>
+<pre><span class="c">// Lambda (before)                    Method reference (after)</span>
+<span class="c">// 1. Static method</span>
+s -&gt; Integer.parseInt(s)       <span class="c">→</span>   Integer::parseInt
+<span class="c">// 2. Instance method of a specific object</span>
+s -&gt; System.out.println(s)     <span class="c">→</span>   System.out::println
+<span class="c">// 3. Instance method of an arbitrary object of a type</span>
+s -&gt; s.toUpperCase()           <span class="c">→</span>   String::toUpperCase
+<span class="c">// 4. Constructor</span>
+() -&gt; <span class="k">new</span> ArrayList&lt;&gt;()        <span class="c">→</span>   ArrayList::<span class="k">new</span></pre>
+<pre><span class="c">// In real code — both lines do exactly the same:</span>
+names.sort((a, b) -&gt; a.compareToIgnoreCase(b));  <span class="c">// lambda</span>
+names.sort(String::compareToIgnoreCase);         <span class="c">// method ref ✔</span></pre>
+      <div class="takeaway">If a lambda's body just calls one method, replace it with a method reference.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">5</span>
+      <h3>Default &amp; Static Methods in Interfaces</h3>
+      <p class="fdesc">Interfaces can now carry implementations — the trick that let Java add stream() to every Collection without breaking the world.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example</span>
+<pre><span class="k">interface</span> Vehicle {
+    String name();                       <span class="c">// abstract — must implement</span>
+    <span class="k">default</span> String honk() {              <span class="c">// default — comes for free</span>
+        <span class="k">return</span> name() + <span class="s">" says beep!"</span>;
+    }
+}
+
+<span class="k">class</span> Car <span class="k">implements</span> Vehicle {
+    <span class="k">public</span> String name() { <span class="k">return</span> <span class="s">"Car"</span>; }
+    <span class="c">// honk() is inherited — no need to write it</span>
+}
+
+<span class="k">new</span> Car().honk();   <span class="c">// "Car says beep!"</span></pre>
+      <ul class="plain" style="margin-top:12px">
+        <li>Evolve interfaces without breaking existing implementations</li>
+        <li>Diamond problem? The class must override and pick: <code>Vehicle.super.honk()</code></li>
+      </ul>
+      <div class="takeaway">Interview trap: what happens when two interfaces define the same default method? You must override.</div>
+    </div>
+  </article>
+</section>
+
+<!-- ================= CHAPTER 3 : JAVA 8 PART 2 ================= -->
+<section class="chapter" id="ch3">
+  <div class="ch-head">
+    <span class="page-chip">3 / 9</span>
+    <div>
+      <h2>Java 8 (2014) — What's New, Part 2</h2>
+      <div class="tag">Optional · Date &amp; Time · CompletableFuture · Parallel Streams · Nashorn</div>
+    </div>
+  </div>
+  <p class="ch-lede">Part 2 covers the safety and concurrency side of Java 8 — the features that killed NullPointerException surprises and made async programming humane.</p>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">6</span>
+      <h3>Optional</h3>
+      <p class="fdesc">Handle values that might be missing — clean &amp; safe. Makes "can be absent" part of the type instead of a hidden null.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Useful Methods</span>
+      <ul class="plain">
+        <li><code>of()</code>, <code>ofNullable()</code>, <code>empty()</code></li>
+        <li><code>isPresent()</code>, <code>isEmpty()</code> (11+)</li>
+        <li><code>ifPresent()</code>, <code>ifPresentOrElse()</code></li>
+        <li><code>orElse()</code>, <code>orElseGet()</code>, <code>orElseThrow()</code></li>
+        <li><code>map()</code>, <code>flatMap()</code>, <code>filter()</code></li>
+      </ul>
+      <span class="lbl alt">Example</span>
+<pre><span class="c">// Before Java 8 — defensive null checks everywhere</span>
+User user = findUser(id);
+String name = <span class="s">"Guest"</span>;
+<span class="k">if</span> (user != <span class="k">null</span> &amp;&amp; user.getName() != <span class="k">null</span>) {
+    name = user.getName();
+}
+
+<span class="c">// Java 8 — absence is explicit, handled in one chain</span>
+String name = findUser(id)        <span class="c">// returns Optional&lt;User&gt;</span>
+    .map(User::getName)           <span class="c">// runs only if present</span>
+    .orElse(<span class="s">"Guest"</span>);             <span class="c">// fallback if empty</span>
+
+<span class="c">// Run something only when a value exists</span>
+findUser(id).ifPresent(u -&gt; System.out.println(u));</pre>
+      <div class="takeaway">Cleaner code. No more NullPointerException!</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">7</span>
+      <h3>Date &amp; Time API</h3>
+      <p class="fdesc">Modern, immutable and thread-safe date &amp; time handling in <code>java.time</code>. Goodbye old Date &amp; Calendar APIs!</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Key Classes</span>
+      <ul class="plain">
+        <li><b>LocalDate</b> — date only · <b>LocalTime</b> — time only · <b>LocalDateTime</b> — both</li>
+        <li><b>Instant</b> — a machine timestamp (epoch)</li>
+        <li><b>Duration</b> — time-based amount · <b>Period</b> — date-based amount</li>
+        <li><b>ZonedDateTime</b> — with time zone · <b>DateTimeFormatter</b> — parsing &amp; formatting</li>
+      </ul>
+      <span class="lbl alt">Quick Example</span>
+<pre><span class="c">// Before Java 8 — mutable & confusing (month is 0-based!)</span>
+Date d = <span class="k">new</span> Date();
+Calendar cal = Calendar.getInstance();
+cal.set(<span class="n">2026</span>, <span class="n">6</span>, <span class="n">3</span>);           <span class="c">// 6 means JULY ?!</span>
+cal.add(Calendar.DAY_OF_MONTH, <span class="n">7</span>);
+
+<span class="c">// Java 8 — immutable, readable, thread-safe</span>
+LocalDate today     = LocalDate.now();          <span class="c">// 2026-07-03</span>
+LocalDate nextWeek  = today.plusDays(<span class="n">7</span>);        <span class="c">// 2026-07-10</span>
+LocalDate lastMonth = today.minusMonths(<span class="n">1</span>);     <span class="c">// 2026-06-03</span>
+
+DateTimeFormatter fmt =
+    DateTimeFormatter.ofPattern(<span class="s">"dd-MM-yyyy"</span>);
+String date = today.format(fmt);                <span class="c">// "03-07-2026"</span></pre>
+      <div class="takeaway">Every method returns a new object — that's what makes it thread-safe.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">8</span>
+      <h3>CompletableFuture</h3>
+      <p class="fdesc">Simplifies async programming with non-blocking, chainable operations. Designed for scalability and performance.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Common Methods</span>
+      <ul class="plain">
+        <li><code>supplyAsync()</code>, <code>thenApply()</code> — start &amp; transform</li>
+        <li><code>thenAccept()</code>, <code>thenRun()</code> — consume the result</li>
+        <li><code>thenCombine()</code>, <code>thenCompose()</code> — join &amp; chain futures</li>
+        <li><code>exceptionally()</code>, <code>whenComplete()</code> — handle errors</li>
+      </ul>
+      <span class="lbl alt">Flow at a Glance</span>
+      <div class="flow">
+        <span class="fstep">▶ Start<br>async task</span><span class="arr">→</span>
+        <span class="fstep">⚙ Process<br>result</span><span class="arr">→</span>
+        <span class="fstep">✔ Handle / save<br>result</span><span class="arr">→</span>
+        <span class="fstep">✖ Handle<br>error</span>
+      </div>
+<pre style="margin-top:14px"><span class="c">// Before — Future can only block and wait</span>
+Future&lt;User&gt; future = executor.submit(() -&gt; fetchUser(id));
+User user = future.get();      <span class="c">// ⛔ thread stuck here until done</span>
+
+<span class="c">// Java 8 — non-blocking chain, each step runs when ready</span>
+CompletableFuture.supplyAsync(() -&gt; fetchUser(id))  <span class="c">// start async</span>
+    .thenApply(User::getEmail)                      <span class="c">// transform</span>
+    .thenAccept(mailer::send)                       <span class="c">// consume</span>
+    .exceptionally(ex -&gt; {                          <span class="c">// recover</span>
+        log.error(ex);
+        <span class="k">return null</span>;
+    });</pre>
+      <div class="takeaway">Future can only block-and-get. CompletableFuture composes — that's the interview answer.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">9</span>
+      <h3>Parallel Streams</h3>
+      <p class="fdesc">Process large datasets faster using multiple cores. Leverage all cores — use wisely!</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example</span>
+<pre><span class="c">// Sequential — runs on one core</span>
+<span class="k">long</span> total = employees.stream()
+    .filter(Employee::isActive)
+    .mapToLong(Employee::getSalary)
+    .sum();
+
+<span class="c">// Parallel — same pipeline, all cores. One word changed.</span>
+<span class="k">long</span> total = employees.parallelStream()
+    .filter(Employee::isActive)
+    .mapToLong(Employee::getSalary)
+    .sum();</pre>
+      <span class="lbl" style="margin-top:14px">Keep in Mind</span>
+      <ul class="plain">
+        <li>Not always faster than sequential streams — splitting has overhead</li>
+        <li>Avoid for I/O-bound operations — it uses the common ForkJoinPool</li>
+        <li>Beware of shared mutable state — it breaks parallel safety</li>
+      </ul>
+      <div class="takeaway">Best for large, CPU-bound, stateless operations. Measure before you parallelize.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">10</span>
+      <h3>Nashorn Engine</h3>
+      <p class="fdesc">Run JavaScript inside the JVM — for scripting and integrations.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example</span>
+<pre>ScriptEngine engine = <span class="k">new</span> ScriptEngineManager()
+    .getEngineByName(<span class="s">"nashorn"</span>);
+Object result = engine.eval(<span class="s">"2 + 3 * 4"</span>);
+System.out.println(result); <span class="c">// 14</span></pre>
+      <span class="lbl" style="margin-top:14px">Note</span>
+      <ul class="plain">
+        <li>Nashorn was <b>deprecated in Java 11</b></li>
+        <li><b>Removed in Java 15</b> — know this for trivia questions</li>
+      </ul>
+      <div class="takeaway">Historical footnote today — mention deprecation and you sound senior.</div>
+    </div>
+  </article>
+
+  <div class="quote-band">Java 8 — The upgrade that made Java modern. <span>Functional. Expressive. Powerful.</span></div>
+</section>
+
+<!-- ================= CHAPTER 4 : JAVA 9, 10, 11 ================= -->
+<section class="chapter" id="ch4">
+  <div class="ch-head">
+    <span class="page-chip">4 / 9</span>
+    <div>
+      <h2>Java 9, 10 &amp; 11 <span class="lts-inline">11 = LTS</span></h2>
+      <div class="tag">Key upgrades that took Java to the next level</div>
+    </div>
+  </div>
+  <p class="ch-lede">Three releases that modernized the platform itself: modules, type inference, and the first long-term release after Java 8.</p>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 9</h3><span class="y">2017</span></div>
+    <p class="vsub">A major step towards modularity, better tooling and performance.</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">📦</span><div><b>Module System (JPMS)</b><span class="d">Structure code using modules with <code>module-info.java</code>. Hide internal packages, export public APIs.</span></div></li>
+        <li><span class="ic">⌨️</span><div><b>JShell</b><span class="d">Interactive command-line shell (REPL) for Java — try code instantly, no class or main() needed.</span></div></li>
+        <li><span class="ic">📋</span><div><b>Collection Factory Methods</b><span class="d"><code>List.of()</code>, <code>Set.of()</code>, <code>Map.of()</code> — immutable and concise.</span></div></li>
+        <li><span class="ic">〰️</span><div><b>Stream Enhancements</b><span class="d">New methods: takeWhile(), dropWhile(), ofNullable(), iterate().</span></div></li>
+        <li><span class="ic">🔒</span><div><b>Private Interface Methods</b><span class="d">Interfaces can now have private helper methods to share code between defaults.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>🎯 Impact</h5>
+        <ul>
+          <li>Modular &amp; maintainable apps</li>
+          <li>Better developer productivity</li>
+          <li>Cleaner &amp; more expressive code</li>
+          <li>Improved performance and scalability</li>
+        </ul>
+<pre>module com.example.app {
+    requires java.base;
+    exports com.example.api;
+    // internals stay hidden
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 10</h3><span class="y">2018</span></div>
+    <p class="vsub">Focused updates that improved developer experience and performance.</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🔤</span><div><b>Local Variable Type Inference — var</b><span class="d">Use <code>var</code> for local variables; the compiler infers the type. Still 100% statically typed — the type is fixed at compile time.</span></div></li>
+        <li><span class="ic">🚀</span><div><b>Application CDS</b><span class="d">Faster JVM startup by sharing pre-loaded classes between runs.</span></div></li>
+        <li><span class="ic">♻️</span><div><b>GC Improvements</b><span class="d">Better garbage collection performance &amp; memory usage; G1 gets a parallel full GC.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>🎯 Impact</h5>
+        <ul>
+          <li>Simpler and cleaner code</li>
+          <li>Faster startup time</li>
+          <li>Better memory management</li>
+          <li>Overall performance boost</li>
+        </ul>
+<pre>var users = new ArrayList&lt;User&gt;();
+var count = users.size();
+// var only for locals — never
+// fields, params or return types</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 11</h3><span class="y">2018</span><span class="lts-badge">LTS</span></div>
+    <p class="vsub">First LTS release after Java 8. Stable, reliable and production-ready.</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🌐</span><div><b>HTTP Client (New)</b><span class="d">Modern, async HTTP client for better performance — HTTP/2 and WebSocket support built in.</span></div></li>
+        <li><span class="ic">🔠</span><div><b>String Enhancements</b><span class="d">New methods like isBlank(), lines(), repeat(), strip() and more.</span></div></li>
+        <li><span class="ic">📄</span><div><b>Files API Improvements</b><span class="d">Read/write an entire file as a String with ease: readString() / writeString().</span></div></li>
+        <li><span class="ic">❓</span><div><b>Optional Enhancements</b><span class="d">New method: isEmpty() — the readable opposite of isPresent().</span></div></li>
+        <li><span class="ic">λ</span><div><b>Lambda 'var' Parameters</b><span class="d">Use var in lambda parameter declarations: <code>(var a, var b) -&gt; ...</code></span></div></li>
+        <li><span class="ic">✨</span><div><b>Other Improvements</b><span class="d">Better performance, security &amp; stability overall. Single-file source launch: <code>java Hello.java</code></span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>🎯 Impact</h5>
+        <ul>
+          <li>Enterprise-grade stability (LTS)</li>
+          <li>Stronger &amp; modern features</li>
+          <li>Better APIs and tooling</li>
+          <li>Production ready for real-world applications</li>
+        </ul>
+<pre>HttpClient client = HttpClient.newHttpClient();
+HttpRequest req = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com"))
+    .build();
+client.sendAsync(req, BodyHandlers.ofString())
+      .thenApply(HttpResponse::body)
+      .thenAccept(System.out::println);</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="why-strip">
+    <span class="t">Why Java 11 matters?</span>
+    <div class="items">
+      <span>LTS Support</span><span>Better APIs</span><span>Simplified Code</span><span>Production Ready</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 5 : JAVA 12-16 ================= -->
+<section class="chapter" id="ch5">
+  <div class="ch-head">
+    <span class="page-chip">5 / 9</span>
+    <div>
+      <h2>Java 12 → Java 16</h2>
+      <div class="tag">Key milestones on the path to Modern Java</div>
+    </div>
+  </div>
+  <p class="ch-lede">Five fast releases where modern Java syntax was born: switch expressions, text blocks, records, sealed classes and pattern matching — most arriving as previews and hardening release by release.</p>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 12</h3><span class="y">2019</span></div>
+    <p class="vsub">Small release, big step forward. ⭐</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🔀</span><div><b>Switch Expressions (Preview)</b><span class="d">Cleaner and more expressive way to write switch — it returns a value, uses arrow syntax, and has no fall-through bugs.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Example</h5>
+<pre>int day = switch(day) {
+    case MONDAY -&gt; 1;
+    case FRIDAY -&gt; 5;
+    default     -&gt; 0;
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 13</h3><span class="y">2019</span></div>
+    <p class="vsub">Text handling made easy. 📝</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">📝</span><div><b>Text Blocks (Preview)</b><span class="d">Write multi-line strings without escaping quotes or new lines — perfect for SQL, JSON and HTML embedded in code.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Example</h5>
+<pre>String sql = """
+    SELECT *
+    FROM Employee
+    WHERE active = true
+    """;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 14</h3><span class="y">2020</span></div>
+    <p class="vsub">Better errors, faster debugging. 🔍</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🐞</span><div><b>Helpful NullPointerException</b><span class="d">The JVM shows the exact variable that was null — no more guessing which reference in a chain exploded.</span></div></li>
+        <li><span class="ic">📦</span><div><b>Records (Preview)</b><span class="d">Compact syntax for immutable data classes — constructor, getters, equals, hashCode, toString: all generated.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Example</h5>
+<pre>NullPointerException:
+Cannot invoke "User.getName()"
+because "user" is null</pre>
+<pre>record User(
+    String name,
+    int age
+) {}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 15</h3><span class="y">2020</span></div>
+    <p class="vsub">Language &amp; runtime getting smarter. 📈</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">✅</span><div><b>Text Blocks (Final)</b><span class="d">Now official in Java — safe to use in production.</span></div></li>
+        <li><span class="ic">🫥</span><div><b>Hidden Classes</b><span class="d">Support for frameworks and runtime libraries that generate classes dynamically.</span></div></li>
+        <li><span class="ic">🛡️</span><div><b>Sealed Classes (Preview)</b><span class="d">Control which classes can extend or implement a type.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Example</h5>
+<pre>String json = """
+    {
+      "name": "Anu",
+      "role": "Developer"
+    }
+    """;</pre>
+<pre>sealed class Shape
+    permits Circle, Square {}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 16</h3><span class="y">2021</span></div>
+    <p class="vsub">More expressive, more stable. ✔️</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">📦</span><div><b>Records (Final)</b><span class="d">Records are stable and ready to use in production.</span></div></li>
+        <li><span class="ic">🔎</span><div><b>Pattern Matching for instanceof (Final)</b><span class="d">Safer and shorter code without explicit casting.</span></div></li>
+        <li><span class="ic">🧺</span><div><b>Stream.toList()</b><span class="d">Collect stream elements directly into an unmodifiable List — no Collectors needed.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Examples</h5>
+<pre>record Product(String id, String name) {}
+
+if (obj instanceof Product p) {
+    System.out.println(p.name());
+}
+
+List&lt;String&gt; names = users.stream()
+    .map(User::getName)
+    .toList();</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-band">Steady features. <span>Stronger Java. Better future.</span></div>
+</section>
+
+<!-- ================= CHAPTER 6 : JAVA 17 ================= -->
+<section class="chapter" id="ch6">
+  <div class="ch-head">
+    <span class="page-chip">6 / 9</span>
+    <div>
+      <h2>Java 17 (2021) <span class="lts-inline">LTS</span></h2>
+      <div class="tag">Powerful upgrades for modern applications</div>
+    </div>
+  </div>
+  <p class="ch-lede">The enterprise standard. Spring Boot 3 requires Java 17 — this is the version most production backends run today. Six upgrades define it.</p>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">1</span>
+      <h3>Sealed Classes</h3>
+      <p class="fdesc">More control over inheritance. Define exactly who can extend or implement.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example</span>
+<pre><span class="k">sealed class</span> Shape <span class="k">permits</span> Circle, Square {}
+<span class="k">final class</span> Circle <span class="k">extends</span> Shape {}
+<span class="k">final class</span> Square <span class="k">extends</span> Shape {}</pre>
+      <div class="takeaway">Stronger safety. Easier maintenance. Enables exhaustive switch over subtypes.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">2</span>
+      <h3>Pattern Matching for instanceof</h3>
+      <p class="fdesc">Type checks made simple and safe.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example</span>
+<pre><span class="c">// Before — check, then cast manually</span>
+<span class="k">if</span> (obj <span class="k">instanceof</span> String) {
+    String s = (String) obj;       <span class="c">// repetitive cast</span>
+    System.out.println(s.length());
+}
+
+<span class="c">// Java 17 — check + bind in one step</span>
+<span class="k">if</span> (obj <span class="k">instanceof</span> String s) {
+    System.out.println(s.length()); <span class="c">// s ready to use</span>
+}</pre>
+      <div class="takeaway">No need for explicit casts — check and bind in one step.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">3</span>
+      <h3>Strong Encapsulation</h3>
+      <p class="fdesc">Better control over internal APIs using the module system — JDK internals are fully hidden by default.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example</span>
+<pre><span class="k">module</span> com.example.app {
+    <span class="k">requires</span> java.base;
+    <span class="k">exports</span> com.example.api;
+    <span class="c">// internal packages are hidden</span>
+}</pre>
+      <div class="takeaway">More security. Cleaner APIs. Libraries can no longer poke at sun.misc internals.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">4</span>
+      <h3>Better GC</h3>
+      <p class="fdesc">ZGC improvements for low latency and high throughput.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl">Benefit</span>
+      <ul class="plain">
+        <li>Lower pause times — sub-millisecond even on big heaps</li>
+        <li>Handles large heaps efficiently</li>
+        <li>Ideal for <b>high-scale</b> applications</li>
+      </ul>
+      <div class="takeaway">Dashboard-style workloads with big result sets love ZGC's short pauses.</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">5</span>
+      <h3>Records, Text Blocks &amp; Switch — All Stable</h3>
+      <p class="fdesc">The modern syntax toolkit born in 12–16 is production-grade in 17. This LTS bundles it all.</p>
+    </div>
+    <div class="fbody">
+      <span class="lbl alt">Example — the modern style together</span>
+<pre><span class="k">record</span> Kpi(String district, <span class="k">double</span> attendance) {}
+
+String label = <span class="k">switch</span>(grade) {
+    <span class="k">case</span> <span class="s">"A"</span> -&gt; <span class="s">"Excellent"</span>;
+    <span class="k">case</span> <span class="s">"B"</span> -&gt; <span class="s">"Good"</span>;
+    <span class="k">default</span> -&gt; <span class="s">"Needs review"</span>;
+};</pre>
+      <div class="takeaway">One release note to remember: "Java 17 = everything from 12–16, finalized."</div>
+    </div>
+  </article>
+
+  <article class="fblock">
+    <div>
+      <span class="fnum">6</span>
+      <h3>More Improvements</h3>
+      <p class="fdesc">The quieter wins that make 17 the enterprise baseline.</p>
+    </div>
+    <div class="fbody">
+      <ul class="plain">
+        <li>New APIs &amp; utilities</li>
+        <li>Performance boosts across the JVM</li>
+        <li>Security enhancements</li>
+        <li>Better developer experience</li>
+      </ul>
+      <div class="takeaway">💡 Java 17 sets the bar for enterprise-grade applications.</div>
+    </div>
+  </article>
+
+  <div class="quote-band">★ STABLE · SECURE · MODERN · <span>ENTERPRISE READY</span> ★</div>
+</section>
+
+<!-- ================= CHAPTER 7 : JAVA 18-21 ================= -->
+<section class="chapter" id="ch7">
+  <div class="ch-head">
+    <span class="page-chip">7 / 9</span>
+    <div>
+      <h2>Java 18 → Java 21 <span class="lts-inline">21 = LTS</span></h2>
+      <div class="tag">From innovation to reliability. From features to performance.</div>
+    </div>
+  </div>
+  <p class="ch-lede">The concurrency revolution: virtual threads appear in preview (19), mature (20), and go final in the LTS everyone was waiting for (21).</p>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 18</h3><span class="y">2022</span></div>
+    <p class="vsub">A minor update packed with useful enhancements. ⭐</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🔤</span><div><b>UTF-8 by Default</b><span class="d">Uniform encoding across all platforms — no more "works on my machine" charset bugs.</span></div></li>
+        <li><span class="ic">🖥️</span><div><b>Simple Web Server</b><span class="d">Lightweight static file server for dev &amp; testing: <code>jwebserver</code> on the command line.</span></div></li>
+        <li><span class="ic">🧮</span><div><b>Vector API (Incubator)</b><span class="d">Better performance for numeric workloads using SIMD instructions.</span></div></li>
+        <li><span class="ic">📄</span><div><b>Javadoc Snippets</b><span class="d">Easier to add code examples in docs with <code>@snippet</code>.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Try it</h5>
+<pre>$ jwebserver -p 9000
+# serves the current directory —
+# perfect for testing a React build</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 19</h3><span class="y">2022</span></div>
+    <p class="vsub">Focused on speed, safety and a better developer experience. 🎯</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🧵</span><div><b>Virtual Threads (Preview)</b><span class="d">Lightweight threads for high concurrency — the headline of the decade arrives.</span></div></li>
+        <li><span class="ic">🛡️</span><div><b>Structured Concurrency (Incubator)</b><span class="d">Safer, simpler concurrent programming — related tasks live and die together.</span></div></li>
+        <li><span class="ic">🔗</span><div><b>Foreign Function &amp; Memory API (Incubator)</b><span class="d">Seamless interop with native code — the JNI replacement takes shape.</span></div></li>
+        <li><span class="ic">🔎</span><div><b>Record Patterns (Preview)</b><span class="d">Pattern matching for records — destructure data directly.</span></div></li>
+        <li><span class="ic">🔀</span><div><b>Enhanced Switch (Preview)</b><span class="d">Cleaner and more expressive switch expressions with type patterns.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>🎯 Also: Java 20 (2023)</h5>
+        <ul>
+          <li>Scoped Values (Preview) — safer alternative to ThreadLocal</li>
+          <li>Virtual threads &amp; record patterns refined in second previews</li>
+          <li>Structured concurrency continues incubating</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>Java 21</h3><span class="y">2023</span><span class="lts-badge">LTS</span></div>
+    <p class="vsub">The latest widely-adopted LTS with power, stability and future-ready features. 🏆</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">🧵</span><div><b>Virtual Threads (Final)</b><span class="d">Production ready. Built for scale — millions of cheap threads; thread-per-request works again.</span></div></li>
+        <li><span class="ic">🔀</span><div><b>Pattern Matching for switch (Final)</b><span class="d">More concise, more powerful — switch over types, with guards.</span></div></li>
+        <li><span class="ic">📦</span><div><b>Record Patterns (Final)</b><span class="d">Simplified data-oriented programming — destructure nested records in one pattern.</span></div></li>
+        <li><span class="ic">🔢</span><div><b>Sequenced Collections</b><span class="d">Collections with a defined encounter order: getFirst(), getLast(), reversed().</span></div></li>
+        <li><span class="ic">💬</span><div><b>String Templates (Preview)</b><span class="d">Safer, readable string handling with embedded expressions.</span></div></li>
+        <li><span class="ic">🔗</span><div><b>FFM API (Third Preview)</b><span class="d">Better access to native code &amp; memory.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 The headline feature</h5>
+<pre>// One virtual thread per task — even
+// for 100,000 concurrent requests
+try (var executor =
+    Executors.newVirtualThreadPerTaskExecutor()) {
+    requests.forEach(r -&gt;
+        executor.submit(() -&gt; handle(r)));
+}</pre>
+<pre>// Pattern matching for switch
+String desc = switch (shape) {
+    case Circle c            -&gt; "circle";
+    case Square s when
+         s.side() &gt; 10       -&gt; "big square";
+    case Square s            -&gt; "square";
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-band">Better today. Stronger tomorrow. <span>Java keeps moving forward.</span></div>
+</section>
+
+<!-- ================= CHAPTER 8 : JAVA 22-25 ================= -->
+<section class="chapter" id="ch8">
+  <div class="ch-head">
+    <span class="page-chip">8 / 9</span>
+    <div>
+      <h2>Java 22 → Java 25 <span class="lts-inline">25 = LTS</span></h2>
+      <div class="tag">The next leap for a stronger Java — latest features · future ready · built for tomorrow</div>
+    </div>
+  </div>
+  <p class="ch-lede">The current frontier: previews maturing, native interop going final, streams gaining superpowers — all converging into the newest long-term release, Java 25.</p>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>1 · Java 22</h3><span class="y">2024</span></div>
+    <p class="vsub">Latest upgrades that boost productivity, performance &amp; developer happiness. 📈</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">💬</span><div><b>String Templates (Preview)</b><span class="d">Safer, cleaner string handling with embedded expressions.</span></div></li>
+        <li><span class="ic">✖️</span><div><b>Unnamed Variables &amp; Patterns (Preview)</b><span class="d">Use <code>_</code> for values you don't need. Less noise, more focus.</span></div></li>
+        <li><span class="ic">🔗</span><div><b>Foreign Function &amp; Memory API (Final)</b><span class="d">Better native access. More power — the modern replacement for JNI ships for real.</span></div></li>
+        <li><span class="ic">⚡</span><div><b>Performance Boosts</b><span class="d">Improved GC, JIT &amp; runtime.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Example</h5>
+<pre>String name = "Anu";
+String msg = STR."Hello, \{name}!";
+System.out.println(msg);
+// (String Templates preview syntax)</pre>
+<pre>// Unnamed variable — we only
+// care that it parses
+try { int _ = Integer.parseInt(s); }
+catch (NumberFormatException _) { }</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>2 · Java 23</h3><span class="y">2024</span></div>
+    <p class="vsub">Continuing the momentum of stability, safety and efficiency. 🛡️</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">〰️</span><div><b>Stream Gatherers (Preview)</b><span class="d">More powerful stream operations — build your own intermediate operations like windowing and custom folding.</span></div></li>
+        <li><span class="ic">🗄️</span><div><b>Scoped Values (Preview)</b><span class="d">Safer sharing in concurrent &amp; structured code — the ThreadLocal successor, ideal with virtual threads.</span></div></li>
+        <li><span class="ic">🔎</span><div><b>Unnamed Patterns &amp; Variables</b><span class="d">Better pattern matching with less ceremony.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>💻 Example — Stream Gatherers</h5>
+<pre>Stream.of(1, 2, 3, 4, 5)
+  .gather(Gatherers.windowFixed(2))
+  .forEach(System.out::println);
+// [1, 2] [3, 4] [5]</pre>
+        <h5 style="margin-top:14px">Flow</h5>
+        <div class="flow">
+          <span class="fstep">Source<br>stream</span><span class="arr">→</span>
+          <span class="fstep">Gather &amp;<br>filter</span><span class="arr">→</span>
+          <span class="fstep">Result<br>✔</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>3 · Java 24</h3><span class="y">2025</span></div>
+    <p class="vsub">Smarter tools and refinements for modern development. ⚙️</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">⭐</span><div><b>Better pattern matching &amp; records</b><span class="d">The data-oriented style keeps sharpening.</span></div></li>
+        <li><span class="ic">⭐</span><div><b>Stronger concurrency building blocks</b><span class="d">Structured concurrency and scoped values keep maturing.</span></div></li>
+        <li><span class="ic">⭐</span><div><b>More stable incubator features</b><span class="d">Vector API and friends approach the finish line.</span></div></li>
+        <li><span class="ic">⭐</span><div><b>JVM improvements</b><span class="d">Continued focus on performance, security &amp; developer experience.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>🎯 Focus Areas</h5>
+        <ul>
+          <li>More expressive Java</li>
+          <li>Stronger performance</li>
+          <li>Safer code</li>
+          <li>Modern developer experience</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="vpanel">
+    <div class="vtop"><h3>4 · Java 25</h3><span class="y">2025</span><span class="lts-badge hot">LTS 🔥 LATEST</span></div>
+    <p class="vsub">The long-term release designed for stability, security and enterprise excellence. 🏆</p>
+    <div class="vgrid">
+      <ul class="hi-list">
+        <li><span class="ic">✅</span><div><b>Long Term Support (LTS)</b><span class="d">Stability you can rely on — the release enterprises will target for years.</span></div></li>
+        <li><span class="ic">✅</span><div><b>Mature incubator features</b><span class="d">Previews from 22–24 arrive ready for real-world use.</span></div></li>
+        <li><span class="ic">✅</span><div><b>Enterprise-grade performance</b><span class="d">Stronger, faster, future-proof.</span></div></li>
+      </ul>
+      <div class="impact">
+        <h5>🎯 Why it matters</h5>
+        <ul>
+          <li>Future-ready applications</li>
+          <li>Better developer productivity</li>
+          <li>Lower maintenance</li>
+          <li>Stronger ecosystem</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="quote-band">✦ EVOLVING TODAY. <span>EMPOWERING TOMORROW.</span> ✦</div>
+</section>
+
+<!-- ================= CHAPTER 9 : INTERVIEW GUIDE ================= -->
+<section class="chapter" id="ch9" style="padding-bottom:56px">
+  <div class="ch-head">
+    <span class="page-chip">9 / 9</span>
+    <div>
+      <h2>Java Interview Guide (2026)</h2>
+      <div class="tag">Backend engineer's roadmap · ★ Must master ★</div>
+    </div>
+  </div>
+  <p class="ch-lede">Everything the previous chapters built, distilled for interview day: the four must-master versions, the questions interviewers actually ask, and a one-line revision of all 18 releases.</p>
+
+  <!-- must master 4 columns -->
+  <div class="mm-grid">
+    <div class="mm-col">
+      <div class="mm-head">☕ JAVA 8</div>
+      <ul>
+        <li>Lambda Expressions</li><li>Functional Interfaces</li><li>Streams API</li>
+        <li>Method References</li><li>Optional</li><li>Default Methods</li>
+        <li>Date &amp; Time API</li><li>CompletableFuture</li><li>Parallel Streams</li>
+      </ul>
+    </div>
+    <div class="mm-col">
+      <div class="mm-head">☕ JAVA 11 <span>LTS</span></div>
+      <ul>
+        <li>HTTP Client</li><li>String APIs</li><li>Files API</li>
+        <li>Collection Factory Methods</li><li>var</li><li>Module System (Basics)</li>
+      </ul>
+    </div>
+    <div class="mm-col">
+      <div class="mm-head">☕ JAVA 17 <span>LTS</span></div>
+      <ul>
+        <li>Records</li><li>Sealed Classes</li><li>Pattern Matching (instanceof)</li>
+        <li>Text Blocks</li><li>Stream.toList()</li>
+      </ul>
+    </div>
+    <div class="mm-col">
+      <div class="mm-head">☕ JAVA 21 <span>LTS</span></div>
+      <ul>
+        <li>Virtual Threads</li><li>Pattern Matching for switch</li><li>Record Patterns</li>
+        <li>Sequenced Collections</li><li>Scoped Values (Basics)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="dark-block">
+    <div class="sec-mini"><span class="q-ic">?</span> Frequently Asked Interview Questions <em>— tap to reveal the answer</em></div>
+    <div class="faq">
+      <details><summary>Stream vs Collection?</summary><div class="a">A Collection <b>stores</b> data in memory and can be traversed many times. A Stream <b>processes</b> data — a lazy, one-time pipeline that stores nothing and doesn't modify its source.</div></details>
+      <details><summary>map() vs flatMap()?</summary><div class="a"><code>map()</code> transforms each element one-to-one (<code>Stream&lt;T&gt; → Stream&lt;R&gt;</code>). <code>flatMap()</code> maps each element to a stream and flattens the results — use when each element yields multiple values, like <code>List&lt;List&lt;T&gt;&gt; → Stream&lt;T&gt;</code>.</div></details>
+      <details><summary>reduce() vs collect()?</summary><div class="a"><code>reduce()</code> folds elements into a single <b>immutable</b> value (sum, min, max). <code>collect()</code> performs <b>mutable</b> accumulation into a container (List, Map, StringBuilder) and is designed to be safe for parallel streams.</div></details>
+      <details><summary>Optional.of() vs ofNullable()?</summary><div class="a"><code>of()</code> throws NullPointerException if given null — use when null would be a bug. <code>ofNullable()</code> returns Optional.empty() for null — use when null is a legal, expected state.</div></details>
+      <details><summary>Why was Optional introduced?</summary><div class="a">To make absence <b>explicit in the type system</b>. Instead of a hidden null waiting to explode, the API says "this may be empty" and forces the caller to decide — eliminating a whole family of NullPointerExceptions.</div></details>
+      <details><summary>Predicate vs Function vs Consumer vs Supplier?</summary><div class="a"><b>Predicate&lt;T&gt;</b>: T → boolean (test). <b>Function&lt;T,R&gt;</b>: T → R (transform). <b>Consumer&lt;T&gt;</b>: T → void (act). <b>Supplier&lt;T&gt;</b>: () → T (provide).</div></details>
+      <details><summary>CompletableFuture vs Future?</summary><div class="a">Future can only block with <code>get()</code>. CompletableFuture is <b>composable and non-blocking</b>: chain with thenApply/thenCompose, merge with thenCombine, recover with exceptionally — and complete it manually.</div></details>
+      <details><summary>Platform Threads vs Virtual Threads?</summary><div class="a">A platform thread wraps an expensive OS thread — you get a few thousand. A virtual thread is a cheap JVM-managed thread multiplexed onto carrier threads — you can run <b>millions</b>, perfect for I/O-heavy services.</div></details>
+      <details><summary>Why are Virtual Threads scalable?</summary><div class="a">Because blocking becomes nearly free: when a virtual thread blocks on I/O, the JVM <b>unmounts</b> it and reuses the OS carrier thread for other work. Thread-per-request scales again — no reactive gymnastics needed.</div></details>
+      <details><summary>Record vs Class?</summary><div class="a">A record is a concise, <b>immutable data carrier</b> — canonical constructor, accessors, equals, hashCode and toString all generated. A class is for mutable state, inheritance and behavior. Records can't extend classes and their fields are final.</div></details>
+      <details><summary>Sealed Class vs Final Class?</summary><div class="a"><code>final</code> forbids all inheritance. <code>sealed</code> allows it — but only for an explicit <code>permits</code> list. You keep polymorphism <b>and</b> control, enabling exhaustive switch over the known subtypes.</div></details>
+      <details><summary>var limitations?</summary><div class="a">Local variables only — never fields, method parameters or return types. Must be initialized at declaration, can't be initialized with null alone, no array initializer shorthand. It's still <b>static typing</b> — the compiler fixes the type once.</div></details>
+    </div>
+  </div>
+
+  <!-- three-column strategy row -->
+  <div class="strategy">
+    <div class="strat-col">
+      <h4>Which Java versions do companies use?</h4>
+      <div class="usage-flow">
+        <div class="uf"><span class="uf-l">📁 Legacy Projects</span><span class="uf-v">Java 8</span></div>
+        <div class="uf-arrow">↓</div>
+        <div class="uf"><span class="uf-l">🔄 Migration Phase</span><span class="uf-v">Java 11</span></div>
+        <div class="uf-arrow">↓</div>
+        <div class="uf"><span class="uf-l">🏢 Enterprise Standard</span><span class="uf-v">Java 17</span></div>
+        <div class="uf-arrow">↓</div>
+        <div class="uf hot"><span class="uf-l">💻 Modern Applications</span><span class="uf-v">Java 21 / Java 25</span></div>
+      </div>
+    </div>
+    <div class="strat-col">
+      <h4>Learning priority</h4>
+      <ol class="prio">
+        <li><b>🎯 Master the basics</b><span>Java 8</span></li>
+        <li><b>&lt;/&gt; Build with APIs</b><span>Java 11</span></li>
+        <li><b>⭐ Modern language upgrades</b><span>Java 17</span></li>
+        <li><b>⚡ Concurrency &amp; performance</b><span>Java 21</span></li>
+        <li><b>📖 Stay ahead</b><span>Java 22–25</span></li>
+      </ol>
+    </div>
+    <div class="strat-col">
+      <h4>One-line revision</h4>
+      <ul class="oneline">
+        <li class="hl"><b>Java 8</b><span>Functional Programming</span></li>
+        <li><b>Java 9</b><span>Modules</span></li>
+        <li><b>Java 10</b><span>var</span></li>
+        <li class="hl"><b>Java 11</b><span>HTTP Client</span></li>
+        <li><b>Java 12</b><span>Switch Expressions</span></li>
+        <li><b>Java 13</b><span>Text Blocks</span></li>
+        <li><b>Java 14</b><span>Helpful NPE + Records</span></li>
+        <li><b>Java 15</b><span>Hidden Classes</span></li>
+        <li><b>Java 16</b><span>Records Final</span></li>
+        <li class="hl"><b>Java 17</b><span>Sealed Classes</span></li>
+        <li><b>Java 18</b><span>UTF-8 by Default</span></li>
+        <li><b>Java 19</b><span>Virtual Threads (Preview)</span></li>
+        <li><b>Java 20</b><span>Scoped Values (Preview)</span></li>
+        <li class="hl"><b>Java 21</b><span>Virtual Threads Final</span></li>
+        <li><b>Java 22</b><span>FFM API (Final)</span></li>
+        <li><b>Java 23</b><span>Stream Gatherers (Preview)</span></li>
+        <li><b>Java 24</b><span>JVM Improvements</span></li>
+        <li class="hl"><b>Java 25</b><span>Latest LTS</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- final tip -->
+  <div class="final-tip">
+    <div class="ft-badge">💡 FINAL TIP</div>
+    <p><b>Master Java 8, 11, 17 &amp; 21 thoroughly.</b><br>
+    Know the highlights of every other version.<br>
+    That's more than enough to ace most modern Java backend interviews. 🤍</p>
+  </div>
+</section>
+
+<footer class="site-footer">Java Evolution Handbook · Java 8 → 25 &amp; Interview Guide · 9 chapters, one language, endless possibilities</footer>
+
+<style>
+/* ===== chapter 9 styles ===== */
+.mm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.mm-col{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow-sm)}
+.mm-head{font-family:var(--disp);font-weight:800;font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--deep)}
+.mm-head span{font-family:var(--mono);font-size:.6rem;font-weight:600;background:var(--purple);color:var(--accent-contrast);padding:2px 8px;border-radius:6px}
+.mm-col ul{list-style:none;display:grid;gap:7px}
+.mm-col li{font-size:.84rem;position:relative;padding-left:22px}
+.mm-col li::before{content:"✓";position:absolute;left:0;top:1px;width:15px;height:15px;border-radius:50%;background:var(--lav);color:var(--purple);font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.dark-block{background:var(--bg-tertiary);border-radius:var(--r);padding:30px;margin-bottom:26px;color:var(--text-primary)}
+.sec-mini{font-family:var(--disp);font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.sec-mini em{font-family:var(--body);font-weight:400;font-style:normal;font-size:.82rem;color:var(--text-secondary)}
+.q-ic{width:34px;height:34px;border-radius:10px;background:var(--purple);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;font-weight:900;flex:none}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.faq details{background:var(--bg-secondary);border:1px solid var(--border-secondary);border-radius:12px;height:fit-content}
+.faq summary{cursor:pointer;padding:13px 16px;font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--mono);color:var(--yellow);font-size:1.1rem;flex:none}
+.faq details[open] summary::after{content:"–"}
+.faq summary:focus-visible{outline:2px solid var(--yellow);outline-offset:-2px;border-radius:12px}
+.faq .a{padding:0 16px 14px;color:var(--text-secondary);font-size:.86rem;line-height:1.6}
+.faq .a code{background:var(--accent-bg);color:var(--text-primary)}
+.faq .a b{color:var(--text-primary)}
+
+.strategy{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:14px;margin-bottom:26px}
+.strat-col{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.strat-col h4{font-family:var(--disp);font-weight:800;font-size:.98rem;margin-bottom:14px;color:var(--deep)}
+.usage-flow{display:flex;flex-direction:column;gap:4px}
+.uf{border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--lav-2)}
+.uf-l{font-size:.82rem;color:var(--slate)}
+.uf-v{font-family:var(--disp);font-weight:800;font-size:.88rem;color:var(--deep);white-space:nowrap}
+.uf.hot{background:var(--accent-bg);border-color:var(--accent)}
+.uf.hot .uf-l{color:var(--text-secondary)}
+.uf.hot .uf-v{color:var(--accent)}
+.uf-arrow{text-align:center;color:var(--purple);font-weight:800;line-height:1}
+.prio{list-style:none;counter-reset:p;display:grid;gap:10px}
+.prio li{counter-increment:p;position:relative;padding:10px 12px 10px 46px;border:1px solid var(--line);border-radius:10px;background:var(--lav-2)}
+.prio li::before{content:counter(p);position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:8px;background:var(--purple);color:var(--accent-contrast);font-family:var(--disp);font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.prio b{display:block;font-size:.86rem;font-weight:700;color:var(--ink)}
+.prio span{font-family:var(--mono);font-size:.72rem;color:var(--purple);font-weight:600}
+.oneline{list-style:none;display:grid;gap:2px;max-height:430px;overflow-y:auto;padding-right:4px}
+.oneline li{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;padding:5px 10px;border-radius:8px}
+.oneline li:nth-child(odd){background:var(--lav-2)}
+.oneline b{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.oneline span{color:var(--slate);text-align:right}
+.oneline li.hl{background:var(--accent-bg)}
+.oneline li.hl b{color:var(--accent)}
+.oneline li.hl span{color:var(--text-primary)}
+
+.final-tip{background:linear-gradient(135deg,var(--purple),var(--deep));border-radius:var(--r);color:#fff;padding:34px 36px;text-align:center}
+/* Fixed yellow chip sits on the fixed accent gradient, so literal
+   colors here stay readable in both themes. */
+.ft-badge{display:inline-block;font-family:var(--disp);font-weight:800;font-size:.8rem;letter-spacing:.1em;background:#fde047;color:#1a1a1a;padding:6px 16px;border-radius:9px;margin-bottom:16px}
+.final-tip p{font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.92)}
+.final-tip b{color:#fff;font-size:1.2em}
+
+.site-footer{text-align:center;color:var(--slate);font-size:.82rem;padding:10px 24px 44px}
+
+@media (max-width:940px){
+  .mm-grid{grid-template-columns:1fr 1fr}
+  .faq{grid-template-columns:1fr}
+  .strategy{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .mm-grid{grid-template-columns:1fr}
+  .dark-block{padding:20px}
+}
+</style>
+</body>
+</html>

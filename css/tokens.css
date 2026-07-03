@@ -1,0 +1,106 @@
+/* ============================================================
+   tokens.css — Design tokens (single source of truth)
+   Dark is the DEFAULT theme (matches the Collections handbook
+   palette). [data-theme="light"] overrides derive a light
+   variant with the same hues.
+   Load this file BEFORE any other stylesheet.
+   ============================================================ */
+
+:root {
+  /* ── Surfaces ── */
+  --bg-primary:   #1a1a1a;
+  --bg-secondary: #282828;
+  --bg-tertiary:  #3e3e3e;
+
+  /* ── Text ── */
+  --text-primary:   #eff1f6;
+  --text-secondary: #8c8c8c;
+  --text-tertiary:  #5c5c5c;
+
+  /* ── Borders ── */
+  --border-primary:   #616161;
+  --border-secondary: #4a4a4a;
+  --border-tertiary:  #333333;
+
+  /* ── Accent (single accent everywhere) ── */
+  --accent:        #0a84ff;
+  --accent-strong: #409cff;   /* hover / emphasis on dark */
+  --accent-bg:     rgba(10, 132, 255, 0.15);
+  --accent-contrast: #ffffff; /* text placed on solid accent */
+
+  /* ── Status ── */
+  --success:    #00b8a3;
+  --success-bg: rgba(0, 184, 163, 0.15);
+  --warning:    #ffc01e;
+  --warning-bg: rgba(255, 192, 30, 0.15);
+  --danger:     #ff375f;
+  --danger-bg:  rgba(255, 55, 95, 0.15);
+
+  /* ── Code blocks ── */
+  --code-bg:   #111111;
+  --code-text: #e4e6eb;
+  --code-comment: #7d8590;
+  --code-keyword: #79b8ff;
+  --code-string:  #ffd98a;
+  --code-accent:  #8ae8c4;
+
+  /* ── Search-highlight <mark> ── */
+  --mark-bg:   #854d0e;
+  --mark-text: #fef9c3;
+
+  /* ── Typography ── */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               Helvetica, Arial, sans-serif;
+  --font-mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo,
+               Courier, monospace;
+
+  /* ── Shape & elevation ── */
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --site-topbar-h: 48px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  /* ── Semantic aliases (main Q&A app) ── */
+  --easy:      var(--success);
+  --easy-bg:   var(--success-bg);
+  --medium:    var(--warning);
+  --medium-bg: var(--warning-bg);
+  --hard:      var(--danger);
+  --hard-bg:   var(--danger-bg);
+}
+
+[data-theme="light"] {
+  --bg-primary:   #f5f6f8;
+  --bg-secondary: #ffffff;
+  --bg-tertiary:  #eceef1;
+
+  --text-primary:   #1a1d23;
+  --text-secondary: #6b7280;
+  --text-tertiary:  #9ca3af;
+
+  --border-primary:   #c3c9d1;
+  --border-secondary: #d4d9df;
+  --border-tertiary:  #e4e7eb;
+
+  --accent:        #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-bg:     rgba(37, 99, 235, 0.10);
+  --accent-contrast: #ffffff;
+
+  --success:    #0d9488;
+  --success-bg: rgba(13, 148, 136, 0.12);
+  --warning:    #b45309;
+  --warning-bg: rgba(217, 119, 6, 0.12);
+  --danger:     #dc2626;
+  --danger-bg:  rgba(220, 38, 38, 0.10);
+
+  --code-bg:   #1e1e2e;
+  --code-text: #cdd6f4;
+
+  --mark-bg:   #fef08a;
+  --mark-text: #713f12;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+}

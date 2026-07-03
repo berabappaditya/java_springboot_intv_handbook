@@ -10,7 +10,6 @@ const state = {
   difficulty:  "all",
   query:       "",
   reviewed:    JSON.parse(localStorage.getItem("reviewed") || "{}"),
-  theme:       localStorage.getItem("theme") || "light",
   expanded:    {}, // questionId → boolean
 };
 
@@ -27,26 +26,17 @@ const els = {
   progressBar:     document.getElementById("progress-bar"),
   progressText:    document.getElementById("progress-text"),
   progressCount:   document.getElementById("progress-count"),
-  themeToggle:     document.getElementById("theme-toggle"),
   expandAllBtn:    document.getElementById("expand-all"),
   collapseAllBtn:  document.getElementById("collapse-all"),
   resultCount:     document.getElementById("result-count"),
 };
 
 // ─── Initialise ──────────────────────────────────────────────
+// (Theme handling lives in js/theme.js, shared by all pages.)
 function init() {
-  applyTheme(state.theme);
   buildNav();
   bindEvents();
   render();
-}
-
-// ─── Theme ───────────────────────────────────────────────────
-function applyTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  els.themeToggle.textContent = theme === "dark" ? "☀️ Light" : "🌙 Dark";
-  state.theme = theme;
-  localStorage.setItem("theme", theme);
 }
 
 // ─── Navigation ──────────────────────────────────────────────
@@ -118,11 +108,6 @@ function bindEvents() {
       });
       render();
     });
-  });
-
-  // Theme toggle
-  els.themeToggle.addEventListener("click", () => {
-    applyTheme(state.theme === "dark" ? "light" : "dark");
   });
 
   // Expand / Collapse all
@@ -469,11 +454,22 @@ function renderAnswer(raw, searchQuery) {
   return html;
 }
 
-/** Apply inline markdown: **bold**, `code` */
+/** Apply inline markdown: **bold**, *italic*, `code` */
 function inlineFormat(text) {
-  return escapeHtml(text)
+  let s = escapeHtml(text);
+
+  // Protect inline code spans first so * inside them is left alone
+  const codes = [];
+  s = s.replace(/`([^`]+)`/g, (_, c) => {
+    codes.push(c);
+    return `\x00INLINE_CODE_${codes.length - 1}\x00`;
+  });
+
+  s = s
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>");
+    .replace(/\*([^*\s][^*\n]*?)\*/g, "<em>$1</em>");
+
+  return s.replace(/\x00INLINE_CODE_(\d+)\x00/g, (_, i) => `<code>${codes[+i]}</code>`);
 }
 
 // ─── Utility ─────────────────────────────────────────────────

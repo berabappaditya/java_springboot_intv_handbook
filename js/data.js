@@ -3,7 +3,7 @@
 // To add your real Q&A: replace the `question` and `answer`
 // fields inside each category's `questions` array.
 // Each answer supports ```java ... ``` fenced code blocks,
-// **bold**, `inline code`, tables, and - / 1. lists.
+// **bold**, *italic*, `inline code`, tables, and - / 1. lists.
 // NOTE: the renderer is a mini-markdown parser (see app.js).
 //   * Do NOT use ### headings or --- rules — use a **bold line**
 //     and blank lines instead.
@@ -1393,6 +1393,754 @@ public int divide(int a, int b) {
 **Spring's take:** Spring wraps checked data-access exceptions (like \`SQLException\`) into *unchecked* \`DataAccessException\` subclasses. The reasoning: most callers can't meaningfully recover from a SQL error, so forcing them to catch it just clutters the code.`,
         difficulty: "easy",
         tags: ["core-java", "exceptions", "error-handling"]
+      },
+      {
+        id: "cj-4",
+        question: "String vs StringBuilder vs StringBuffer — what's the difference?",
+        answer: `The key fact behind this question: **\`String\` is immutable**. Once created, its characters can never change. Every "modification" (\`concat\`, \`replace\`, \`+\`) silently creates a **brand-new String object**, leaving the old one for the garbage collector.
+
+That's fine for a few operations, but in a loop it creates a pile of throwaway objects. \`StringBuilder\` and \`StringBuffer\` fix this: they hold a **mutable** internal char array you can append to cheaply.
+
+| | String | StringBuilder | StringBuffer |
+|---|---|---|---|
+| Mutable | No | **Yes** | **Yes** |
+| Thread-safe | Yes (immutable) | No | Yes (synchronized) |
+| Speed | Slow for repeated edits | **Fastest** | Slower (locking overhead) |
+| Introduced | Java 1 | Java 5 | Java 1 |
+
+**Example in Action**
+
+\`\`\`java
+// BAD — builds ~10,000 intermediate String objects
+String s = "";
+for (int i = 0; i < 10_000; i++) {
+    s += i;                    // each += allocates a new String
+}
+
+// GOOD — one buffer, appended in place
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i < 10_000; i++) {
+    sb.append(i);
+}
+String result = sb.toString();
+\`\`\`
+
+**Rules of thumb:**
+- Plain text values, map keys, constants → **String**.
+- Building text in a loop or through many steps → **StringBuilder** (the default choice).
+- Same, but the *same builder instance* is shared by multiple threads → **StringBuffer** (rare in practice — usually each thread builds its own).
+
+**Interview bonus:** simple concatenations in a single expression (\`"a" + b + "c"\`) are compiled to \`StringBuilder\` (or \`invokedynamic\` in Java 9+) automatically — the manual builder only matters across loop iterations.`,
+        difficulty: "easy",
+        tags: ["core-java", "strings", "performance", "immutability"]
+      },
+      {
+        id: "cj-5",
+        question: "What does the final keyword do (variables, methods, classes)?",
+        answer: `\`final\` means "this cannot be changed" — but *what* exactly can't change depends on where you put it.
+
+| Used on | Effect |
+|---|---|
+| **Variable** | Can be assigned exactly **once** — no reassignment after that |
+| **Method** | Subclasses **cannot override** it |
+| **Class** | **Cannot be extended** at all (no subclasses) |
+
+**Example in Action**
+
+\`\`\`java
+final int MAX_RETRIES = 3;
+// MAX_RETRIES = 5;              // compile error — cannot reassign
+
+final List<String> names = new ArrayList<>();
+names.add("Alice");              // OK! The OBJECT is still mutable
+// names = new ArrayList<>();    // compile error — the REFERENCE is final
+
+class Parent {
+    final void connect() { }     // subclasses may not override this
+}
+
+final class Config { }           // nobody can extend Config
+// class MyConfig extends Config { }   // compile error
+\`\`\`
+
+**The #1 trap interviewers probe:** \`final\` on a reference variable locks the *reference*, **not the object it points to**. A \`final List\` can still be added to. If you want unchangeable contents, you need an immutable object (e.g. \`List.of(...)\`).
+
+**Where you see it in real code:**
+- Constants: \`public static final\` fields.
+- \`String\`, \`Integer\`, \`LocalDate\` are \`final\` **classes** — that guarantees their immutability can't be broken by a subclass.
+- Effectively-final locals are what lambdas are allowed to capture.`,
+        difficulty: "easy",
+        tags: ["core-java", "final", "immutability", "keywords"]
+      },
+      {
+        id: "cj-6",
+        question: "Explain the static keyword. How do static members differ from instance members?",
+        answer: `\`static\` means "belongs to the **class itself**, not to any particular object." There is exactly **one copy** of a static member, shared by every instance — instance members get a fresh copy per object.
+
+| | Instance member | Static member |
+|---|---|---|
+| Belongs to | Each object | The class (one shared copy) |
+| Access via | \`object.field\` | \`ClassName.field\` |
+| Can use \`this\`? | Yes | **No** — there is no instance |
+| Memory | Heap, per object | Once per class |
+
+**Example in Action**
+
+\`\`\`java
+class Counter {
+    static int totalCreated = 0;   // shared by ALL Counter objects
+    int myNumber;                  // each object has its own
+
+    Counter() {
+        totalCreated++;            // bumps the one shared counter
+        myNumber = totalCreated;
+    }
+}
+
+new Counter(); new Counter(); new Counter();
+System.out.println(Counter.totalCreated); // 3 — accessed via the CLASS
+\`\`\`
+
+**The four places static appears:**
+1. **Static fields** — shared state/constants (\`Math.PI\`).
+2. **Static methods** — utilities that need no instance (\`Math.max\`, \`Collections.sort\`). They **cannot** touch instance fields or call instance methods directly — there's no \`this\` to work on.
+3. **Static blocks** — run **once** when the class is loaded; used for complex constant initialization.
+4. **Static nested classes** — a nested class that doesn't need a reference to the outer instance (e.g. \`Map.Entry\`).
+
+**Interview traps:**
+- Static methods are **not overridden**, they are *hidden* (resolved at compile time by reference type).
+- Overusing static state makes code hard to test — which is exactly why Spring prefers injected singleton **beans** over static singletons.`,
+        difficulty: "easy",
+        tags: ["core-java", "static", "keywords", "memory"]
+      },
+      {
+        id: "cj-7",
+        question: "Is Java pass-by-value or pass-by-reference?",
+        answer: `Java is **always pass-by-value**. No exceptions. The confusion comes from what that value *is*:
+
+- For **primitives**, the value is the number itself — the method gets a copy of the number.
+- For **objects**, the value is the **reference** (the "address") — the method gets a *copy of the reference*, and both copies point at the **same object**.
+
+So: a method **can mutate the object** you passed (both references point to it), but it **cannot make your variable point somewhere else** (it only has a copy of your reference).
+
+**Example in Action**
+
+\`\`\`java
+static void mutate(List<String> list) {
+    list.add("added");           // works — same underlying object
+}
+
+static void reassign(List<String> list) {
+    list = new ArrayList<>();    // only changes the local COPY of the reference
+    list.add("lost");
+}
+
+List<String> mine = new ArrayList<>();
+mutate(mine);
+System.out.println(mine);        // [added]      — mutation is visible
+reassign(mine);
+System.out.println(mine);        // [added]      — reassignment was NOT
+\`\`\`
+
+**The mental model:** think of a reference as a slip of paper with a house address on it. Passing it to a method photocopies the slip. The method can walk to the house and repaint it (mutation — you'll see it), but scribbling a new address on *its photocopy* changes nothing for you (reassignment — invisible to the caller).
+
+**One-line interview answer:** "Java passes everything by value; for objects, the value being copied is the reference — so callees can mutate the shared object but can't rebind the caller's variable."`,
+        difficulty: "medium",
+        tags: ["core-java", "pass-by-value", "references", "methods"]
+      },
+      {
+        id: "cj-8",
+        question: "What is autoboxing/unboxing, and what pitfalls come with wrapper classes?",
+        answer: `Every primitive has an object **wrapper class** (\`int\` → \`Integer\`, \`double\` → \`Double\`, …). You need wrappers wherever an *object* is required — generics (\`List<Integer>\`, never \`List<int>\`), collections, and nullable fields.
+
+**Autoboxing** = the compiler automatically converting primitive → wrapper. **Unboxing** = wrapper → primitive.
+
+\`\`\`java
+List<Integer> list = new ArrayList<>();
+list.add(5);          // autoboxing:  int 5  →  Integer.valueOf(5)
+int x = list.get(0);  // unboxing:    Integer →  int
+\`\`\`
+
+It looks seamless — which is exactly why the pitfalls bite.
+
+**Pitfall 1 — \`==\` and the Integer cache.** \`Integer.valueOf\` caches values from **-128 to 127**. Inside the range you get the *same* cached object; outside it, new objects:
+
+\`\`\`java
+Integer a = 127, b = 127;
+System.out.println(a == b);        // true  — both from the cache
+Integer c = 128, d = 128;
+System.out.println(c == d);        // false — two different objects!
+System.out.println(c.equals(d));   // true  — ALWAYS compare wrappers with equals()
+\`\`\`
+
+**Pitfall 2 — NullPointerException on unboxing.** A wrapper can be \`null\`; a primitive can't:
+
+\`\`\`java
+Integer count = ordersMap.get("missing-key");  // returns null
+int total = count + 1;                          // NPE! null cannot unbox
+\`\`\`
+
+**Pitfall 3 — performance in hot loops.** Each box is an object allocation:
+
+\`\`\`java
+Long sum = 0L;
+for (long i = 0; i < 1_000_000; i++) sum += i;  // ~1M Long objects created
+// Fix: use primitive 'long sum' — orders of magnitude faster
+\`\`\`
+
+**Takeaways:** compare wrappers with \`.equals()\`, never \`==\`; guard against \`null\` before unboxing (or use \`getOrDefault\`); prefer primitives in performance-sensitive code.`,
+        difficulty: "medium",
+        tags: ["core-java", "autoboxing", "wrapper-classes", "integer-cache"]
+      },
+      {
+        id: "cj-9",
+        question: "How do you create an immutable class in Java? Why is String immutable?",
+        answer: `An **immutable** object can never change after construction. That single property buys you: free thread-safety (nothing to synchronize), safe use as \`HashMap\` keys (hash never changes), and no defensive copying by callers.
+
+**The recipe (know all five steps):**
+1. Declare the class \`final\` — so no subclass can add mutable behavior.
+2. Make every field \`private final\`.
+3. Provide **no setters** — set everything in the constructor.
+4. **Defensive-copy mutable inputs** in the constructor (dates, lists, arrays).
+5. **Never return internal mutable state** — return copies or unmodifiable views.
+
+**Example in Action**
+
+\`\`\`java
+public final class Employee {                       // 1. final class
+    private final String name;                      // 2. private final
+    private final List<String> skills;
+
+    public Employee(String name, List<String> skills) {
+        this.name = name;
+        this.skills = new ArrayList<>(skills);      // 4. copy IN
+    }
+
+    public String getName() { return name; }        // 3. no setters
+
+    public List<String> getSkills() {
+        return List.copyOf(skills);                 // 5. copy OUT
+    }
+}
+\`\`\`
+
+Skip step 4 or 5 and the caller can mutate your "immutable" object through the shared list — the classic interview follow-up.
+
+**Why String is immutable — the four reasons interviewers want:**
+- **String pool** — literals are shared between variables; that's only safe if nobody can change them.
+- **Security** — file paths, URLs, class names are passed as Strings; a mutable String could be swapped *after* a security check.
+- **Hash caching** — \`String\` caches its \`hashCode\`, making it a fast, reliable \`HashMap\` key.
+- **Thread safety** — Strings can be shared across threads with zero synchronization.
+
+**Modern shortcut:** a \`record\` (Java 16+) gives you steps 1–3 automatically — you still own the defensive copies:
+
+\`\`\`java
+public record Employee(String name, List<String> skills) {
+    public Employee { skills = List.copyOf(skills); }  // compact constructor copy
+}
+\`\`\``,
+        difficulty: "medium",
+        tags: ["core-java", "immutability", "strings", "records", "thread-safety"]
+      }
+    ]
+  },
+
+  {
+    id: "oops",
+    title: "Java OOPs Concepts",
+    icon: "🧩",
+    questions: [
+      {
+        id: "oop-1",
+        question: "What are the four pillars of OOP? Explain each with an example.",
+        answer: `The four pillars are the foundation every other OOP question builds on. Know a one-liner *and* a concrete Java example for each.
+
+| Pillar | One-liner | Java tool |
+|---|---|---|
+| **Encapsulation** | Bundle data + methods; hide the data behind a controlled interface | \`private\` fields + getters/setters |
+| **Abstraction** | Expose *what* something does, hide *how* | \`interface\`, \`abstract class\` |
+| **Inheritance** | A class reuses and extends another ("is-a") | \`extends\` |
+| **Polymorphism** | One reference type, many runtime behaviors | overriding + dynamic dispatch |
+
+**Example in Action** — all four in ~20 lines:
+
+\`\`\`java
+// ABSTRACTION — callers know WHAT a shape does, not HOW
+abstract class Shape {
+    abstract double area();
+}
+
+// INHERITANCE — Circle IS-A Shape
+class Circle extends Shape {
+    // ENCAPSULATION — radius is hidden; exposed via constructor only
+    private final double radius;
+    Circle(double radius) { this.radius = radius; }
+
+    @Override
+    double area() { return Math.PI * radius * radius; }
+}
+
+class Square extends Shape {
+    private final double side;
+    Square(double side) { this.side = side; }
+
+    @Override
+    double area() { return side * side; }
+}
+
+// POLYMORPHISM — same call, different behavior at runtime
+List<Shape> shapes = List.of(new Circle(2), new Square(3));
+for (Shape s : shapes) {
+    System.out.println(s.area());   // JVM picks Circle.area() or Square.area()
+}
+\`\`\`
+
+**How they connect (good closing line in an interview):** encapsulation protects state, abstraction defines contracts, inheritance shares the contract implementation, and polymorphism lets callers use any implementation through the contract without knowing which one they got — which is exactly how Spring injects an interface and swaps implementations freely.`,
+        difficulty: "easy",
+        tags: ["oops", "pillars", "polymorphism", "encapsulation", "inheritance", "abstraction"]
+      },
+      {
+        id: "oop-2",
+        question: "What is the difference between abstraction and encapsulation?",
+        answer: `They sound similar because both "hide" something — but they hide **different things for different reasons**.
+
+- **Abstraction** hides **complexity**: it shows the caller *what* an object can do and hides *how* it does it. It's a **design-level** idea, achieved with interfaces and abstract classes.
+- **Encapsulation** hides **data**: it locks internal state behind access modifiers so it can only change through controlled methods. It's an **implementation-level** idea, achieved with \`private\` fields.
+
+| | Abstraction | Encapsulation |
+|---|---|---|
+| Hides | Implementation complexity | Internal state/data |
+| Question answered | *What* does it do? | *How is data protected?* |
+| Achieved via | \`interface\`, \`abstract class\` | \`private\` + getters/setters |
+| Level | Design | Implementation |
+
+**Example in Action**
+
+\`\`\`java
+// ABSTRACTION: callers see only "you can pay" — not the gateway logic
+interface PaymentService {
+    void pay(BigDecimal amount);
+}
+
+class StripePaymentService implements PaymentService {
+    // ENCAPSULATION: the key is private; nobody can read or replace it
+    private final String apiKey;
+
+    StripePaymentService(String apiKey) { this.apiKey = apiKey; }
+
+    @Override
+    public void pay(BigDecimal amount) {
+        // hidden implementation details...
+    }
+}
+\`\`\`
+
+**The classic analogy:** a car. *Abstraction* is the steering wheel and pedals — a simple interface over a complex engine. *Encapsulation* is the sealed hood — you can't reach in and poke the engine's internals directly.
+
+**One-liner to close:** "Abstraction hides complexity behind an interface; encapsulation hides data behind access control."`,
+        difficulty: "easy",
+        tags: ["oops", "abstraction", "encapsulation", "interfaces"]
+      },
+      {
+        id: "oop-3",
+        question: "Method overloading vs method overriding — what's the difference?",
+        answer: `Both reuse a method *name*, but they are completely different mechanisms resolved at different times.
+
+- **Overloading** = same name, **different parameter list**, in the **same class**. The compiler picks the right one **at compile time** by looking at the argument types → *compile-time (static) polymorphism*.
+- **Overriding** = a **subclass replaces** an inherited method with the **exact same signature**. The JVM picks the version **at runtime** based on the actual object → *runtime (dynamic) polymorphism*.
+
+| | Overloading | Overriding |
+|---|---|---|
+| Where | Same class | Parent → child |
+| Signature | Must **differ** (params) | Must be **identical** |
+| Return type | Can be anything | Same or covariant (subtype) |
+| Access modifier | Anything | Cannot be **narrower** than parent's |
+| Resolved | Compile time | Runtime |
+| Annotation | — | \`@Override\` (always use it!) |
+
+**Example in Action**
+
+\`\`\`java
+class Printer {
+    // OVERLOADING — three methods, one name, different params
+    void print(String s)  { System.out.println("text: " + s); }
+    void print(int i)     { System.out.println("number: " + i); }
+    void print(String s, int copies) { /* ... */ }
+}
+
+class Animal {
+    void speak() { System.out.println("..."); }
+}
+class Dog extends Animal {
+    @Override                       // OVERRIDING — same signature
+    void speak() { System.out.println("Woof!"); }
+}
+
+Animal a = new Dog();
+a.speak();   // "Woof!" — runtime type (Dog) decides, not reference type
+\`\`\`
+
+**Interview traps:**
+- \`static\`, \`private\`, and constructors **cannot be overridden** (statics are *hidden* — see the method-hiding question). \`final\` methods can't be either.
+- An override may throw **fewer/narrower checked exceptions**, never broader ones.
+- Always write \`@Override\` — it turns a silent typo (accidental overload) into a compile error.`,
+        difficulty: "easy",
+        tags: ["oops", "overloading", "overriding", "polymorphism"]
+      },
+      {
+        id: "oop-4",
+        question: "Interface vs abstract class — differences and when to use which?",
+        answer: `Both define contracts that other classes fill in, but they answer different design questions:
+
+- An **interface** says: "anything that *can do this* — regardless of what it is." (a capability)
+- An **abstract class** says: "here is a *partially built* thing — finish it." (a shared skeleton)
+
+| | Interface | Abstract class |
+|---|---|---|
+| A class can have | **Many** (implements A, B, C) | Only **one** (extends) |
+| State (instance fields) | No (only \`public static final\` constants) | **Yes** — full fields |
+| Constructors | No | **Yes** |
+| Method bodies | \`default\` / \`static\` methods (Java 8+), \`private\` (Java 9+) | Any methods |
+| Member access levels | Implicitly \`public\` | \`private\` → \`public\`, anything |
+| Relationship it models | "can-do" (\`Comparable\`, \`Serializable\`) | "is-a" with shared code |
+
+**Example in Action**
+
+\`\`\`java
+// INTERFACE — a capability any class can bolt on
+interface Auditable {
+    void audit(String action);
+
+    default void auditWithTime(String action) {      // Java 8+ default body
+        audit(action + " at " + java.time.Instant.now());
+    }
+}
+
+// ABSTRACT CLASS — shared state + a template with one hole to fill
+abstract class BaseRepository {
+    protected final DataSource ds;                    // shared STATE
+    BaseRepository(DataSource ds) { this.ds = ds; }   // CONSTRUCTOR
+
+    public final void save(Object entity) {           // shared logic
+        validate(entity);
+        // ...common persistence code
+    }
+    protected abstract void validate(Object entity);  // the hole
+}
+\`\`\`
+
+**Decision guide:**
+- Contract only, multiple unrelated implementers, or you need "multiple inheritance" of type → **interface** (the default choice in modern Java).
+- Shared **fields**, constructors, or a template method with common logic → **abstract class**.
+
+**Interview follow-up:** "Since Java 8 default methods, why still use abstract classes?" — because interfaces **still can't hold instance state or constructors**. Default methods share *behavior*, not *state*.`,
+        difficulty: "medium",
+        tags: ["oops", "interface", "abstract-class", "default-methods", "design"]
+      },
+      {
+        id: "oop-5",
+        question: "Why doesn't Java support multiple inheritance of classes? What is the diamond problem?",
+        answer: `Java allows a class to **extend only one class** — a deliberate design choice to avoid the **diamond problem**.
+
+**The diamond problem:** imagine class \`D\` could extend both \`B\` and \`C\`, which each override a method from their common parent \`A\`:
+
+\`\`\`java
+      A          class A { void greet() { ... } }
+     / \\
+    B   C        // B and C BOTH override greet() differently
+     \\ /
+      D          class D extends B, C { }   // ILLEGAL in Java
+                 // d.greet() — B's version or C's version? Ambiguous!
+\`\`\`
+
+C++ allows this and forces developers to disambiguate manually; Java's designers chose to ban it for classes entirely.
+
+**But interfaces? A class CAN implement many.** That was always safe for abstract methods (no bodies → no conflict). Java 8 \`default\` methods re-introduced the risk — and Java solves it with **explicit rules**:
+
+1. **Class wins over interface** — a method inherited from a superclass always beats a default method.
+2. **More specific interface wins** — if \`B extends A\`, B's default beats A's.
+3. **Still ambiguous? You must override** — the compiler forces the class to resolve the conflict itself:
+
+\`\`\`java
+interface Camera {
+    default void powerOn() { System.out.println("Camera on"); }
+}
+interface Phone {
+    default void powerOn() { System.out.println("Phone on"); }
+}
+
+class SmartPhone implements Camera, Phone {
+    @Override
+    public void powerOn() {                 // compiler FORCES this override
+        Camera.super.powerOn();             // explicitly pick one (or both)
+        Phone.super.powerOn();
+    }
+}
+\`\`\`
+
+**One-line summary:** Java bans multiple *class* inheritance to avoid ambiguous inherited **state and behavior**; multiple *interface* inheritance is allowed because conflicts are impossible (abstract methods) or must be resolved explicitly (\`InterfaceName.super.method()\`).`,
+        difficulty: "medium",
+        tags: ["oops", "multiple-inheritance", "diamond-problem", "default-methods"]
+      },
+      {
+        id: "oop-6",
+        question: "Composition vs inheritance — why is composition usually preferred?",
+        answer: `Two ways to reuse code:
+
+- **Inheritance ("is-a")** — \`class Car extends Vehicle\`. Car *is a* Vehicle and inherits its behavior.
+- **Composition ("has-a")** — \`class Car { private Engine engine; }\`. Car *has an* Engine and delegates to it.
+
+The classic advice — from *Effective Java* — is **"favor composition over inheritance."** Why:
+
+| Problem with inheritance | How composition avoids it |
+|---|---|
+| **Tight coupling** — child depends on parent internals; parent changes ripple down (fragile base class) | Depends only on the component's public API |
+| **Locked at compile time** — you inherit everything, forever | Swap components at **runtime** (pass a different Engine) |
+| **One parent max** — single inheritance is quickly "used up" | Compose as many parts as you like |
+| **Leaky abstractions** — you inherit methods that make no sense for you | Expose only what you choose to delegate |
+
+**Example in Action** — the classic broken-inheritance bug:
+
+\`\`\`java
+// BROKEN: extends HashSet to count insertions
+class CountingSet<E> extends HashSet<E> {
+    int count = 0;
+    @Override public boolean add(E e) { count++; return super.add(e); }
+    @Override public boolean addAll(Collection<? extends E> c) {
+        count += c.size();
+        return super.addAll(c);   // BUG: HashSet.addAll calls add() internally
+    }                             // → every element counted TWICE
+}
+
+// FIXED with composition: wrap a Set, delegate explicitly
+class CountingSet<E> {
+    private final Set<E> inner = new HashSet<>();
+    private int count = 0;
+
+    public boolean add(E e) { count++; return inner.add(e); }
+    public boolean addAll(Collection<? extends E> c) {
+        boolean changed = false;
+        for (E e : c) changed |= add(e);   // OUR add — counting is correct
+        return changed;
+    }
+}
+\`\`\`
+
+**When inheritance IS right:** a genuine, stable *is-a* relationship where the subclass is a true subtype (\`ArrayList extends AbstractList\`), or framework template methods.
+
+**Spring connection:** dependency injection is composition at framework scale — your service *has-a* repository injected, rather than extending one.`,
+        difficulty: "medium",
+        tags: ["oops", "composition", "inheritance", "design", "effective-java"]
+      },
+      {
+        id: "oop-7",
+        question: "What is constructor chaining? How do this() and super() work?",
+        answer: `**Constructor chaining** = one constructor calling another, so object setup logic lives in exactly one place instead of being copy-pasted.
+
+Two tools:
+- **\`this(...)\`** — call *another constructor of the same class*.
+- **\`super(...)\`** — call a *parent-class constructor*.
+
+**The rules (interviewers check all four):**
+1. \`this()\` / \`super()\` must be the **first statement** in a constructor — so you can use at most **one** of them per constructor.
+2. If you write neither, the compiler silently inserts **\`super()\`** (no-arg).
+3. If the parent has **no** no-arg constructor, you're **forced** to call \`super(args)\` explicitly — a very common compile error.
+4. Chaining always runs **top-down**: \`Object\` → parent → child.
+
+**Example in Action**
+
+\`\`\`java
+class Vehicle {
+    private final String make;
+    Vehicle(String make) {              // NOTE: no no-arg constructor
+        this.make = make;
+        System.out.println("1. Vehicle");
+    }
+}
+
+class Car extends Vehicle {
+    private final String model;
+    private final int year;
+
+    Car(String make, String model, int year) {
+        super(make);                    // REQUIRED — parent has no no-arg ctor
+        this.model = model;
+        this.year = year;
+        System.out.println("2. Car(full)");
+    }
+
+    Car(String make, String model) {
+        this(make, model, 2025);        // chain to the full constructor
+        System.out.println("3. Car(short)");
+    }
+}
+
+new Car("Toyota", "Corolla");
+// prints: 1. Vehicle  →  2. Car(full)  →  3. Car(short)
+\`\`\`
+
+**Why chain with \`this()\`?** One "main" constructor holds all validation/assignment; the others just fill in defaults and delegate. One place to maintain, no duplicated logic — the same idea builder patterns take further.
+
+**Bonus trap:** never call an **overridable method** from a constructor — the child's override runs *before* the child's fields are initialized.`,
+        difficulty: "easy",
+        tags: ["oops", "constructors", "this", "super", "chaining"]
+      },
+      {
+        id: "oop-8",
+        question: "Can you override static or private methods in Java?",
+        answer: `**No to both** — and explaining *why* is what earns the points.
+
+**Private methods:** they're invisible to subclasses. If the child declares a method with the same name, it's simply a brand-new, unrelated method — not an override.
+
+**Static methods:** overriding is powered by **dynamic dispatch** — the JVM picking the method based on the *object's runtime type*. Static methods don't belong to objects at all; calls are resolved **at compile time from the reference type**. Declaring the same static method in a child is called **method hiding**.
+
+**Example in Action** — hiding vs overriding side by side:
+
+\`\`\`java
+class Parent {
+    static void staticGreet()   { System.out.println("static: Parent"); }
+    void instanceGreet()        { System.out.println("instance: Parent"); }
+}
+
+class Child extends Parent {
+    static void staticGreet()   { System.out.println("static: Child"); }  // HIDES
+    @Override
+    void instanceGreet()        { System.out.println("instance: Child"); } // OVERRIDES
+}
+
+Parent p = new Child();      // reference type: Parent, object: Child
+
+p.instanceGreet();   // "instance: Child"  — RUNTIME object type wins
+p.staticGreet();     // "static: Parent"   — COMPILE-TIME reference type wins!
+\`\`\`
+
+That last line is the whole interview question in one output: the *same-looking call* behaves differently because statics never participate in polymorphism.
+
+**Quick reference:**
+
+| Member | Child redefines it → | Dispatch |
+|---|---|---|
+| Instance method | **Overriding** | Runtime object type |
+| Static method | **Hiding** | Compile-time reference type |
+| Private method | Unrelated new method | — |
+| Fields (all) | **Hiding** (fields never override) | Compile-time reference type |
+
+**Practical advice:** always call statics as \`ClassName.method()\`, never through a variable — it makes the compile-time binding obvious and avoids exactly this confusion. (\`@Override\` on a static won't compile, which is your safety net.)`,
+        difficulty: "medium",
+        tags: ["oops", "static", "method-hiding", "overriding", "polymorphism"]
+      },
+      {
+        id: "oop-9",
+        question: "Explain association, aggregation, and composition with examples.",
+        answer: `All three describe "class A is connected to class B" — the difference is **ownership** and **lifecycle**. Think of it as a strength scale:
+
+**Association (weakest)** → **Aggregation** → **Composition (strongest)**
+
+| | Association | Aggregation | Composition |
+|---|---|---|---|
+| Meaning | "uses / knows" | "has-a" (shared part) | "owns" (exclusive part) |
+| Ownership | None | Weak | **Strong** |
+| Part outlives the whole? | Independent | **Yes** | **No — dies with it** |
+| Example | Doctor ↔ Patient | Department — Professor | House — Room |
+
+**1. Association** — objects interact; neither owns the other:
+
+\`\`\`java
+class Doctor {
+    void treat(Patient p) { /* uses a Patient, doesn't keep or own it */ }
+}
+\`\`\`
+
+**2. Aggregation** — whole *has* parts, but parts live independently. The giveaway: the part is **created outside and passed in**:
+
+\`\`\`java
+class Professor { }
+
+class Department {
+    private final List<Professor> professors;      // has professors...
+    Department(List<Professor> professors) {       // ...but receives them
+        this.professors = professors;
+    }
+}
+// Close the department → the professors still exist (other departments, etc.)
+\`\`\`
+
+**3. Composition** — whole **creates and exclusively owns** its parts. The giveaway: the part is **instantiated inside** and never leaks out:
+
+\`\`\`java
+class House {
+    private final List<Room> rooms = new ArrayList<>();
+    House(int roomCount) {
+        for (int i = 0; i < roomCount; i++) rooms.add(new Room());  // born inside
+    }
+}
+// Demolish the house → its rooms are gone. A Room can't exist without its House.
+\`\`\`
+
+**How to tell them apart in code (the practical test):** ask *"if I delete the whole, do the parts survive?"* Yes → aggregation. No → composition. And *"does it even keep a field reference?"* No, just a method parameter → plain association.
+
+**Note:** this "composition" (UML lifecycle ownership) is related to but broader than the "composition over inheritance" principle — that one is about preferring *has-a* delegation to *is-a* extension.`,
+        difficulty: "medium",
+        tags: ["oops", "association", "aggregation", "composition", "uml", "relationships"]
+      },
+      {
+        id: "oop-10",
+        question: "Explain the SOLID principles with Java examples.",
+        answer: `SOLID is five design principles that keep object-oriented code **maintainable, testable, and safe to extend**. Interviewers usually want the name, a one-liner, and a tiny example for each.
+
+**S — Single Responsibility Principle (SRP):** a class should have **one reason to change**.
+
+\`\`\`java
+// BAD: report logic + persistence + email in one class
+class ReportService { void generate(){} void saveToDb(){} void email(){} }
+
+// GOOD: three classes, three responsibilities
+class ReportGenerator {} class ReportRepository {} class ReportMailer {}
+\`\`\`
+
+**O — Open/Closed Principle (OCP):** open for **extension**, closed for **modification** — add features with *new classes*, not by editing working code.
+
+\`\`\`java
+interface DiscountPolicy { BigDecimal apply(BigDecimal price); }
+class NoDiscount implements DiscountPolicy { /* ... */ }
+class BlackFriday implements DiscountPolicy { /* ... */ }
+// New discount type? Add a class. Checkout code never changes.
+\`\`\`
+
+**L — Liskov Substitution Principle (LSP):** a subclass must be usable **anywhere its parent is expected** — same promises, no surprises. The classic violation:
+
+\`\`\`java
+class Rectangle { void setWidth(int w){} void setHeight(int h){} }
+class Square extends Rectangle {
+    // forced to make setWidth also change height → breaks Rectangle's contract
+}
+// Code that resizes a Rectangle silently misbehaves when handed a Square.
+\`\`\`
+
+**I — Interface Segregation Principle (ISP):** many **small, focused** interfaces beat one fat one — clients shouldn't be forced to implement methods they don't need.
+
+\`\`\`java
+// BAD: interface Machine { print(); scan(); fax(); }
+// GOOD:
+interface Printer { void print(); }
+interface Scanner { void scan(); }
+class SimplePrinter implements Printer { /* no dummy scan()/fax() */ }
+\`\`\`
+
+**D — Dependency Inversion Principle (DIP):** depend on **abstractions**, not concrete classes; high-level policy shouldn't know low-level details.
+
+\`\`\`java
+class OrderService {
+    private final PaymentGateway gateway;          // interface, not StripeGateway
+    OrderService(PaymentGateway gateway) {         // dependency INJECTED
+        this.gateway = gateway;
+    }
+}
+\`\`\`
+
+**The Spring connection (great closer):** Spring is SOLID applied at framework scale — beans get **abstractions injected** (DIP), you swap implementations without touching consumers (OCP), and \`@Service\` / \`@Repository\` layering nudges you toward SRP. Mock the interface and every class is unit-testable.`,
+        difficulty: "hard",
+        tags: ["oops", "solid", "design-principles", "srp", "dependency-inversion"]
       }
     ]
   },

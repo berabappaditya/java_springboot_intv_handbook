@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Interactive Java + Spring Boot Interview Handbook">
   <title>Java & Spring Boot Interview Handbook</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/styles.css">
+  <script src="js/theme.js"></script>
 </head>
 <body>
 
@@ -17,7 +20,13 @@
       ☰
     </button>
     <div class="logo">☕ Java &amp; <span>Spring Boot</span> Handbook</div>
-    <button id="theme-toggle" aria-label="Toggle dark/light theme">🌙 Dark</button>
+    <nav class="topbar-nav" aria-label="Topic handbooks">
+      <a class="topbar-link active" href="index.html" aria-current="page">Home</a>
+      <a class="topbar-link" href="java_collections_framework.html">Collections</a>
+      <a class="topbar-link" href="java-evolution-handbook.html">Java Evolution</a>
+      <a class="topbar-link" href="spring-boot-handbook.html">Spring Boot</a>
+    </nav>
+    <button id="theme-toggle" class="theme-btn" aria-label="Toggle dark/light theme">🌙 Dark</button>
   </header>
 
   <!-- Mobile overlay -->
@@ -29,6 +38,32 @@
       <h3>Categories</h3>
     </div>
     <ul id="nav-list" role="list"></ul>
+    <div class="sidebar-section" aria-label="Topic handbooks">
+      <h3>Topic Handbooks</h3>
+      <ul role="list">
+        <li>
+          <a class="nav-btn" href="java_collections_framework.html">
+            <span class="nav-icon">📚</span>
+            <span class="nav-label">Collections Framework</span>
+            <span class="nav-ext">↗</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-btn" href="java-evolution-handbook.html">
+            <span class="nav-icon">🚀</span>
+            <span class="nav-label">Java Evolution 8→25</span>
+            <span class="nav-ext">↗</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-btn" href="spring-boot-handbook.html">
+            <span class="nav-icon">🍃</span>
+            <span class="nav-label">Spring Boot Notes</span>
+            <span class="nav-ext">↗</span>
+          </a>
+        </li>
+      </ul>
+    </div>
   </nav>
 
   <!-- ── Main content ────────────────────────────────────── -->

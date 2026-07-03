@@ -77,11 +77,27 @@ Each **question** inside the array:
 
 ```
 interview-handbook/
-├── index.html          HTML shell
+├── index.html                        Main Q&A app shell
+├── java_collections_framework.html   Topic handbook: Collections
+├── java-evolution-handbook.html      Topic handbook: Java 8 → 25
+├── spring-boot-handbook.html         Topic handbook: Spring Boot notes
 ├── css/
-│   └── styles.css      All styles (CSS variables for theming)
+│   ├── tokens.css      Design tokens — single source of truth for
+│   │                   colors/fonts/radii (dark default + light)
+│   ├── components.css  Shared components (site topbar, badges, tables, tabs)
+│   └── styles.css      Main-app styles, consumes tokens
 └── js/
+    ├── theme.js        Shared dark/light toggle (localStorage, all pages)
     ├── data.js         ← PASTE YOUR Q&A HERE
     ├── search.js       Filter / highlight logic
     └── app.js          Rendering, state, event wiring
 ```
+
+## Design system
+
+All pages share one theme. `css/tokens.css` defines the palette
+(dark is the default; `[data-theme="light"]` overrides it). Each topic
+handbook keeps its own page-local CSS variable names but remaps them onto
+the shared tokens in its `:root` block — restyle the whole site by editing
+`tokens.css` only. Every page loads `js/theme.js`, so the theme choice
+persists across pages (`?theme=light|dark` in the URL also works).

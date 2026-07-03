@@ -1,30 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spring Boot Handbook — Complete Notes (Part 1 & 2)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<script src="js/theme.js"></script>
 <style>
+/* Page-local variable names are remapped onto the shared design
+   tokens (css/tokens.css) so both themes flow through untouched. */
 :root{
-  --paper:#F8FAFC;          /* page background */
-  --paper-deep:#FFFFFF;     /* sidebar */
-  --rule:#E2E8F0;           /* hairline borders */
-  --ink:#16A34A;            /* Spring green accent */
-  --ink-dark:#0F172A;       /* headings / strong */
-  --red:#E11D48;            /* warnings & callouts */
-  --text:#374151;
-  --muted:#64748B;
-  --card:#FFFFFF;
-  --code-bg:#0F172A;
-  --code-ink:#E2E8F0;
-  --shadow:0 1px 2px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.05);
+  --paper:var(--bg-primary);        /* page background */
+  --paper-deep:var(--bg-secondary); /* sidebar */
+  --rule:var(--border-tertiary);    /* hairline borders */
+  --ink:var(--accent);              /* accent */
+  --ink-dark:var(--text-primary);   /* headings / strong */
+  --red:var(--danger);              /* warnings & callouts */
+  --text:var(--text-primary);
+  --muted:var(--text-secondary);
+  --card:var(--bg-secondary);
+  --code-ink:var(--code-text);
+  --shadow:var(--shadow-sm);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:'Inter',system-ui,sans-serif;
+  font-family:var(--font-sans);
   background:var(--paper);
   color:var(--text);
   line-height:1.7;
@@ -33,65 +35,67 @@ body{
 }
 /* ---------- layout ---------- */
 .wrap{display:flex;min-height:100vh}
-nav{
-  width:284px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+.wrap nav{
+  width:284px;flex-shrink:0;position:sticky;top:var(--site-topbar-h);
+  height:calc(100vh - var(--site-topbar-h));overflow-y:auto;
   background:var(--paper-deep);
   border-right:1px solid var(--rule);
   padding:32px 20px 48px;
 }
-nav::-webkit-scrollbar{width:5px}
-nav::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
-nav h1{
-  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+.wrap nav::-webkit-scrollbar{width:5px}
+.wrap nav::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+.wrap nav h1{
+  font-family:var(--font-sans);color:var(--ink-dark);
   font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.02em;
   margin-bottom:4px;
 }
-nav .sub{
+.wrap nav .sub{
   font-size:11px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink);font-weight:600;margin-bottom:24px;
 }
-nav .part-label{
-  font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+.wrap nav .part-label{
+  font-family:var(--font-sans);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--muted);margin:22px 0 8px;font-weight:600;
   padding-bottom:6px;border-bottom:1px solid var(--rule);
 }
-nav a{
+.wrap nav a{
   display:flex;align-items:baseline;color:var(--text);text-decoration:none;font-size:13.5px;
   padding:6px 10px;border-radius:8px;font-weight:450;transition:background .15s,color .15s;
 }
-nav a:hover{background:#F0FDF4;color:var(--ink-dark)}
-nav a .n{
+.wrap nav a:hover{background:var(--accent-bg);color:var(--ink-dark)}
+.wrap nav a .n{
   flex-shrink:0;width:28px;color:var(--muted);
-  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+  font-family:var(--font-mono);font-size:11px;font-weight:600;
 }
-nav a:hover .n{color:var(--ink)}
-main{flex:1;max-width:1080px;padding:56px 64px 120px;margin:0 auto}
+.wrap nav a:hover .n{color:var(--ink)}
+main{flex:1;max-width:1080px;padding:56px 64px 120px;margin:0 auto;min-width:0}
 /* ---------- sections & headings ---------- */
 section{
   margin-bottom:64px;background:var(--card);
   border:1px solid var(--rule);border-radius:16px;
   padding:40px 44px 34px;box-shadow:var(--shadow);
-  scroll-margin-top:24px;
+  scroll-margin-top:calc(var(--site-topbar-h) + 24px);
+  overflow-x:auto; /* wide tables scroll inside the card, never the page */
 }
 h2{
-  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-family:var(--font-sans);color:var(--ink-dark);
   font-size:26px;font-weight:700;letter-spacing:-.02em;
   margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--rule);
   display:flex;align-items:baseline;gap:14px;
 }
 h2 .num{
-  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
-  color:var(--ink);background:#F0FDF4;border:1px solid #BBF7D0;
+  font-family:var(--font-mono);font-size:13px;font-weight:600;
+  color:var(--ink);background:var(--accent-bg);border:1px solid var(--border-tertiary);
   padding:3px 10px;border-radius:6px;letter-spacing:0;flex-shrink:0;transform:translateY(-3px);
 }
 h3{
-  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-family:var(--font-sans);color:var(--ink-dark);
   font-size:17.5px;font-weight:600;letter-spacing:-.01em;
   margin:32px 0 12px;display:flex;align-items:center;gap:10px;
 }
 h3::before{content:"";width:4px;height:17px;border-radius:2px;background:var(--ink);flex-shrink:0}
 h4{
-  font-family:'Space Grotesk',sans-serif;color:var(--ink-dark);
+  font-family:var(--font-sans);color:var(--ink-dark);
   font-size:14.5px;font-weight:600;margin:18px 0 8px;
 }
 p{margin-bottom:12px;max-width:80ch}
@@ -101,20 +105,22 @@ strong{color:var(--ink-dark);font-weight:600}
 em.note{color:var(--red);font-style:normal;font-weight:600}
 /* ---------- cards / boxes ---------- */
 .box{
-  background:#F8FAFC;border:1px solid var(--rule);border-radius:12px;
+  background:var(--bg-primary);border:1px solid var(--rule);border-radius:12px;
   padding:18px 22px;margin:14px 0 20px;
 }
 .box.dashed{border-style:dashed;background:var(--card)}
-.box.redline{background:#FFF1F2;border-color:#FECDD3}
+.box.redline{background:var(--danger-bg);border-color:var(--danger)}
 .box-title{
-  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
+  font-family:var(--font-sans);font-size:11px;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dark);
   margin-bottom:10px;display:block;
 }
 .box.redline .box-title{color:var(--red)}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;margin-top:16px}
-/* keep both columns starting at the same baseline (reset first-child top margins) */
-.cols>*{margin-top:0}
+/* keep both columns starting at the same baseline (reset first-child top margins);
+   min-width:0 lets wide pre/tables scroll inside their column instead of
+   widening the page */
+.cols>*{margin-top:0;min-width:0}
 .cols>*>:first-child{margin-top:0}
 @media(max-width:940px){.cols{grid-template-columns:1fr}}
 /* ---------- tables ---------- */
@@ -124,9 +130,9 @@ table{
   border:1px solid var(--rule);border-radius:10px;overflow:hidden;
 }
 th{
-  font-family:'Inter',sans-serif;font-size:11px;font-weight:700;
+  font-family:var(--font-sans);font-size:11px;font-weight:700;
   letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
-  text-align:left;padding:10px 14px;background:#F8FAFC;
+  text-align:left;padding:10px 14px;background:var(--bg-primary);
   border-bottom:1px solid var(--rule);
 }
 td{
@@ -134,22 +140,22 @@ td{
   border-bottom:1px solid var(--rule);
 }
 tr:last-child td{border-bottom:none}
-tbody tr:hover td, table tr:hover td{background:#FAFCFF}
+tbody tr:hover td, table tr:hover td{background:var(--bg-tertiary)}
 td code, li code, p code{
-  font-family:'JetBrains Mono',monospace;font-size:12.3px;
-  background:#F1F5F9;color:#0F766E;border:1px solid #E2E8F0;
-  padding:1px 6px;border-radius:5px;white-space:nowrap;
+  font-family:var(--font-mono);font-size:12.3px;
+  background:var(--bg-tertiary);color:var(--success);border:1px solid var(--border-tertiary);
+  padding:1px 6px;border-radius:5px;overflow-wrap:anywhere;
 }
 /* ---------- code blocks ---------- */
 pre{
   background:var(--code-bg);color:var(--code-ink);border-radius:12px;
   padding:18px 20px;overflow-x:auto;margin:12px 0 20px;
-  font-family:'JetBrains Mono',monospace;font-size:12.8px;line-height:1.65;
+  font-family:var(--font-mono);font-size:12.8px;line-height:1.65;
 }
-pre .c{color:#7C8DB0;font-style:italic}
-pre .k{color:#93C5FD}
-pre .a{color:#6EE7B7}
-pre .s{color:#FCA5A5}
+pre .c{color:var(--code-comment);font-style:italic}
+pre .k{color:var(--code-keyword)}
+pre .a{color:var(--code-accent)}
+pre .s{color:var(--code-string)}
 /* ---------- flow diagrams ---------- */
 /* horizontal flow = single clean row; scroll instead of ragged wrapping */
 .flow{
@@ -159,7 +165,7 @@ pre .s{color:#FCA5A5}
 .flow::-webkit-scrollbar{height:6px}
 .flow::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
 .flow .step{
-  background:#F8FAFC;border:1px solid var(--rule);border-radius:10px;
+  background:var(--bg-primary);border:1px solid var(--rule);border-radius:10px;
   padding:12px 16px;text-align:center;min-width:110px;flex:0 0 auto;
   font-size:13px;font-weight:600;color:var(--ink-dark);
   display:flex;flex-direction:column;justify-content:center;
@@ -175,18 +181,18 @@ pre .s{color:#FCA5A5}
 .flow.vert .arr{padding:4px 0;transform:rotate(90deg)}
 /* ---------- badges ---------- */
 .pill{
-  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+  display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;
   border:1px solid var(--rule);border-radius:6px;padding:2px 9px;margin:2px 4px 2px 0;
-  color:var(--ink-dark);background:#F8FAFC;letter-spacing:.02em;
+  color:var(--ink-dark);background:var(--bg-tertiary);letter-spacing:.02em;
 }
-.tag-get{color:#16A34A;border-color:#BBF7D0;background:#F0FDF4}
-.tag-post{color:#D97706;border-color:#FDE68A;background:#FFFBEB}
-.tag-put{color:#2563EB;border-color:#BFDBFE;background:#EFF6FF}
-.tag-del{color:#E11D48;border-color:#FECDD3;background:#FFF1F2}
+.tag-get{color:var(--success);border-color:var(--success-bg);background:var(--success-bg)}
+.tag-post{color:var(--warning);border-color:var(--warning-bg);background:var(--warning-bg)}
+.tag-put{color:var(--accent);border-color:var(--accent-bg);background:var(--accent-bg)}
+.tag-del{color:var(--danger);border-color:var(--danger-bg);background:var(--danger-bg)}
 /* ---------- part divider ---------- */
 .part-divider{margin:56px 0 48px;text-align:center;position:relative}
 .part-divider span{
-  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;
+  font-family:var(--font-sans);font-size:13px;font-weight:700;
   letter-spacing:.18em;text-transform:uppercase;color:var(--ink);
   background:var(--paper);padding:0 22px;position:relative;z-index:1;
 }
@@ -194,12 +200,12 @@ pre .s{color:#FCA5A5}
   content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule);
 }
 .footer-note{
-  font-family:'Space Grotesk',sans-serif;color:var(--muted);
+  font-family:var(--font-sans);color:var(--muted);
   font-size:14.5px;font-weight:500;text-align:center;margin-top:48px;
   border-top:1px solid var(--rule);padding-top:24px;line-height:2;
 }
 @media(max-width:820px){
-  nav{display:none}
+  .wrap nav{display:none}
   main{padding:28px 18px 80px}
   section{padding:26px 20px}
   h2{font-size:22px;flex-wrap:wrap}
@@ -207,6 +213,20 @@ pre .s{color:#FCA5A5}
 </style>
 </head>
 <body>
+
+<header class="site-topbar">
+  <div class="site-topbar-in">
+    <a class="topbar-brand" href="index.html">☕ Java &amp; <span class="accent">Spring Boot</span> Handbook</a>
+    <nav class="topbar-nav" aria-label="Topic handbooks">
+      <a class="topbar-link" href="index.html">Home</a>
+      <a class="topbar-link" href="java_collections_framework.html">Collections</a>
+      <a class="topbar-link" href="java-evolution-handbook.html">Java Evolution</a>
+      <a class="topbar-link active" href="spring-boot-handbook.html" aria-current="page">Spring Boot</a>
+    </nav>
+    <button id="theme-toggle" class="theme-btn" aria-label="Toggle dark/light theme">🌙 Dark</button>
+  </div>
+</header>
+
 <div class="wrap">
 <nav>
   <h1>Spring Boot Handbook</h1>
